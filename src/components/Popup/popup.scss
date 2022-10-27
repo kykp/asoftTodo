@@ -1,0 +1,62 @@
+.popup{
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100%;
+    height: 100%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index:200;
+}
+
+.popup-inner {
+    position: absolute;
+    top:150px;
+    left: 0;
+    padding: 10px;
+    width: 100%;
+    max-width: 250px; 
+    background: rgb(255, 255, 255); 
+    box-shadow: 1px 1px 1px 2px rgba(72, 72, 72, 0.21);
+    border-radius: 10px;
+    color: black; 
+    
+    &__menu { 
+        max-width: 80%;
+        margin: 0 auto;
+        background-color: rgba(0, 0, 0, 0.832);
+        margin-top: 5px;
+        padding: 5px;
+        border-radius: 3px;
+        cursor: pointer;
+        transition: all 0.3s ease-in-out;
+        color: white;
+
+        &:hover {
+            background-color: rgba(0, 0, 0, 0.95);
+            color: rgb(52, 177, 255);
+        }
+    }
+}
+
+.popup-inner .close-btn {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    cursor: pointer;
+    background: transparent;
+    transition: color 0.3s ease-in-out;
+    &:hover {
+        color:rgb(0, 140, 255);
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .popup-inner { 
+        display: block;
+        top: 150px!important;
+        left: 150px!important;
+    }
+    
+}

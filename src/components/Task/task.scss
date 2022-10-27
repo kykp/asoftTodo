@@ -1,0 +1,32 @@
+.task-container{
+    margin-top: 20px;
+    // width: 100%;
+    position: relative; 
+    &__header{ 
+        position: absolute;
+        top: 0;
+        right: -15px;
+        max-width: 50px; 
+        & img {
+            width: 30%;
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+    &__text {   
+        width: 100%;
+        border: none;
+        overflow-y: hidden;
+        overflow: hidden scroll;
+        overflow-wrap: break-word;
+        overflow-y: auto;
+        padding: 5px 10px;
+        resize: none;
+        height: 90px; 
+        box-shadow: 1px 1px 0px 1px rgba(0, 0, 0, 0.51);
+        border-radius: 5px;
+        padding-top: 20px;
+    } 
+}
+ 
