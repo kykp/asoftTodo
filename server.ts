@@ -4,7 +4,6 @@ import { taskRouter } from "./task.js";
 import { startBaseMongo } from "./mongoconnect.js";
 import bodyParser from "body-parser";
 import  cors from "cors";
-import path from "path";
 
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
 
