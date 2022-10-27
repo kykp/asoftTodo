@@ -11,6 +11,8 @@ const getProjects = async (req: Request, res: Response) => {
       res.json(projects);
     } catch (error) {
       console.log(error);
+    } finally {
+      console.log("we work")
     }
 };
 
