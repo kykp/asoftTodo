@@ -1,10 +1,9 @@
-import React, {useState}  from 'react'
+import React, {useState }  from 'react'
 import { useAppDispatch } from '../../hook'
-import {changeTask} from "../../feauters/todo/todoSlice"
-import "./task.scss"
+import {changeTask, changeTodoTitle, addCurrentDragObject} from "../../feauters/todo/todoSlice" 
 import GambIcon from "../../assets/icons/hamburger.png"
- 
-import  {Popup}  from "../Popup/Popup"
+import "./task.scss"; 
+import  {Popup}  from "../Popup/Popup"  
 
 interface Todo { 
   id: string,
@@ -12,16 +11,20 @@ interface Todo {
   status: string,
   project: string,
   archive: boolean,
-  deleted: boolean,  
+  deleted: boolean,    
+  setNewStatusForDragItem: (status: string) => void,
 }
+ 
 
-
-export const Task: React.FC<Todo> = ({ id, title, status, project, archive, deleted } ) => { 
+export const Task: React.FC<Todo> = ({ id, title, status, project, archive, deleted, setNewStatusForDragItem} ) => {  
   const [taskTitle, setTaskTitle] = useState(title)
   const [showPopup, setShowPopup] = useState(false)
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
-  const dispatch = useAppDispatch(); 
+ 
 
+  const dispatch = useAppDispatch(); 
+ 
+   
   const onHandlePopup = () => {
     setShowPopup(!showPopup)
   }
@@ -35,11 +38,37 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
   }
 
   const onHandleChangeTitle = (e:any) => {
+    dispatch(changeTodoTitle({id, title: e.target.value}));
     setTaskTitle(e.target.value) 
   }
+
+ const dragStartHandler = (e:any) =>{   
+  dispatch(addCurrentDragObject({ id, title, status, project, archive, deleted}))
+  }
+
+ const dragEndHandler = (e:any) =>{ 
+  e.target.style.boxShadow = "none"
+ }
+ const dragLeaveHandler = (e:any) =>{ 
+  e.target.style.boxShadow = "none"
+ }
+ const dragOverHandler = (e:any) =>{
+  e.preventDefault();
+  if (e.target.className === "task-container__text") {
+    e.target.style.boxShadow = "0 4px 3px black"
+  } 
+ }
  
+ const dropHandler = (e:any,  ) =>{ 
+  e.preventDefault();
+  e.target.style.boxShadow = "none";   
+  setNewStatusForDragItem(status);
+ } 
+   
   return (  
-    <div className='task-container'>  
+    <div 
+      className='task-container' 
+    >  
       <div className='task-container__header'>
        <img id={id}  src={GambIcon} alt="" onClick={(event)=> onHamburgerClick(event)}/>
        <Popup 
@@ -55,14 +84,19 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
        />
       </div>
 
-      <textarea 
+      <textarea   
+       onDragStart={(e) => dragStartHandler(e)}
+       onDragLeave={(e) => dragLeaveHandler(e)}
+       onDragEnd={(e) => dragEndHandler(e)}
+       onDragOver={(e) => dragOverHandler(e)}
+       onDrop={(e) => dropHandler(e)}
+       draggable={true}
           className = "task-container__text" 
           placeholder= "Ввести заголовок для этой карточки" 
           name="" 
           id={id} 
           value={taskTitle} 
-          onChange={(e)=>  onHandleChangeTitle(e)}
-          onMouseLeave={onChangeProjectTitle}
+          onChange={(e)=>  onHandleChangeTitle(e)} 
           onBlur={onChangeProjectTitle}
           cols ={30}
           rows ={3}>

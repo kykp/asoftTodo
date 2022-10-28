@@ -24,9 +24,10 @@ type Project = {
 type TodosState = {
   list: Todo[] , 
   projects: Project[],
+  drag: Todo[],
   filters: string, 
   loading: boolean,
-  error: string | null,
+  error: string | null, 
 }
  
 export const fetchProjects = createAsyncThunk<Project[], void, {rejectValue: string}> ("todos/fetchProjects", async (_,{ rejectWithValue}) => {
@@ -131,8 +132,7 @@ export const addTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todo
   return (await response.json()) as Todo; 
 });
 
-export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/changeTask", async ({id, title, status, project, archive, deleted }, {rejectWithValue, dispatch},) => { 
-  
+export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/changeTask", async ({id, title, status, project, archive, deleted }, {rejectWithValue, dispatch},) => {  
   const response = await fetch(`http://localhost:5000/tasks/change`, {
     method: "POST",
     headers: {
@@ -153,15 +153,22 @@ export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("t
 const initialState : TodosState = {
   projects: [],
   list: [], 
+  drag: [],
   filters: filters.filter,
   loading: false,
-  error: null,
+  error: null, 
 };
 
 export const todoSlice = createSlice({
   name: "todos",
   initialState,
   reducers: { 
+    addCurrentDragObject:(state, action) => {
+      state.drag.push(action.payload);
+    },
+    deleteDragArray: (state) =>{
+      state.drag = []
+    },
     changeTodoTitle: (state, action: PayloadAction<{id:string, title: string}>) => { 
      const currentTask = state.list.find(task => task.id === action.payload.id)
      if (currentTask){
@@ -222,7 +229,7 @@ export const todoSlice = createSlice({
    
 });
 
-export const { changeTodoTitle, changeProjectName,  changeTaskReducer, filterBy    } = todoSlice.actions;
+export const { changeTodoTitle, changeProjectName,  changeTaskReducer, filterBy, addCurrentDragObject ,deleteDragArray   } = todoSlice.actions;
 export default todoSlice.reducer;
 
 function isError(action: AnyAction) {

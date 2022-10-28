@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import "./workzone.scss";
 import { useAppDispatch, useAppSelector } from "../../hook";
-import { addTask } from "../../feauters/todo/todoSlice";
+import { addTask, changeTask, deleteDragArray } from "../../feauters/todo/todoSlice";
 import { v4 as uuidv4 } from "uuid";
-import { Task } from "../../components/Task/Task";    
+import { Task } from "../../components/Task/Task";      
 
 type Todo = {
   id: string,
@@ -11,13 +11,15 @@ type Todo = {
   status: string,
   project: string,
   archive: boolean,
-  deleted: boolean,    
+  deleted: boolean,   
 }
-export const WorkZone  = () => { 
+export const WorkZone  = () => {    
   const filter = useAppSelector(store => store.todo.filters);
   const todos = useAppSelector(store => store.todo.list);
+  const drag = useAppSelector(store => store.todo.drag); 
   const dispatch = useAppDispatch();  
  
+  
   const addTodoHandler = (e: any) => { 
     const todo = {
       id: uuidv4(),
@@ -29,25 +31,63 @@ export const WorkZone  = () => {
     }; 
     dispatch(addTask(todo));
   };
-    
-  return (
+   
+  const setNewStatusForDragItem = ( status: string) => {    
+    let item = drag.at(-1);
+    if (item){
+      dispatch(changeTask({
+        id: item.id, 
+        title: item.title,
+        status,   
+        project: item.project, 
+        archive: item.archive, 
+        deleted: item.deleted
+      })); 
+    } 
+    dispatch(deleteDragArray());
+  }
+
+
+  const dragOverHandler = (e: any) => {
+    e.preventDefault(); 
+  }
+  const dropHandler = (e: any) => {
+    e.preventDefault(); 
+    setNewStatusForDragItem(e.currentTarget.id) 
+  }
+
+  console.log(drag)
+  return ( 
     <div className="workzone">
-      <div className="tasks">
-        <div className="tasks__item"> 
+      <div className="tasks" >
+        <div  
+          className="tasks__item" 
+          id="inPlan" 
+          onDragOver={(e) => dragOverHandler(e)}
+          onDrop={(e) => dropHandler(e)} 
+        > 
           <div className="task task__planing"> 
             <h3 className="task__title">Запланировано</h3>
             {todos.map((el: Todo) => {  
               if (el.status === "inPlan" && el.project === filter && !el.archive && !el.deleted ) {
                 return (
-                  <Task key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  <Task   
+                  key={el.id}   
+                  setNewStatusForDragItem={setNewStatusForDragItem} 
+                  id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  
+                  />
                 )
               } else if (filter === "archive" && el.status === "inPlan" && el.archive){
                 return (
-                  <Task key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  <Task
+                  setNewStatusForDragItem={setNewStatusForDragItem} 
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
                 )
               } else if (filter === "deleted" && el.status === "inPlan" && el.deleted){
                 return (
-                  <Task key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} />
+                  <Task 
+                  setNewStatusForDragItem={setNewStatusForDragItem} 
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} />
                 )
               }
             })}
@@ -65,21 +105,32 @@ export const WorkZone  = () => {
 
         </div>
 
-        <div className="tasks__item">
+        <div 
+          className="tasks__item" 
+          id="inProcess" 
+          onDragOver={(e) => dragOverHandler(e)}
+          onDrop={(e) => dropHandler(e)} 
+        >
           <div className="task task__process">
             <h3 className="task__title">В процессе</h3>
             {todos.map((el: Todo) => { 
               if (el.status === "inProcess" && el.project === filter && !el.archive && !el.deleted ) {
                 return (
-                  <Task key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  <Task 
+                  setNewStatusForDragItem={setNewStatusForDragItem} 
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
                 )
               } else if (filter === "archive" && el.status === "inProcess" && el.archive){
                 return (
-                  <Task key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} />
+                  <Task 
+                  setNewStatusForDragItem={setNewStatusForDragItem} 
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} />
                 )
               } else if (filter === "deleted" && el.status === "inProcess" && el.deleted){
                 return (
-                  <Task key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  <Task 
+                  setNewStatusForDragItem={setNewStatusForDragItem} 
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
                 )
               }
             })}
@@ -92,21 +143,32 @@ export const WorkZone  = () => {
           
         </div>
 
-        <div className="tasks__item">
+        <div 
+          className="tasks__item" 
+          id="done" 
+          onDragOver={(e) => dragOverHandler(e)}
+          onDrop={(e) => dropHandler(e)} 
+          >
           <div className="task task__done">
             <h3 className="task__title">Выполнено</h3>
             {todos.map((el: Todo) => { 
               if (el.status === "done" && el.project === filter && !el.archive && !el.deleted ) {
                 return (
-                  <Task key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  <Task 
+                  setNewStatusForDragItem={setNewStatusForDragItem} 
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
                 )
               } else if (filter === "archive" && el.status === "done" && el.archive){
                 return (
-                  <Task key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  <Task 
+                  setNewStatusForDragItem={setNewStatusForDragItem} 
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
                 )
               } else if (filter === "deleted" && el.status === "done" && el.deleted){
                 return (
-                  <Task key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  <Task 
+                  setNewStatusForDragItem={setNewStatusForDragItem} 
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
                 )
               }
             })}
@@ -118,6 +180,6 @@ export const WorkZone  = () => {
         } 
         </div>
       </div>
-    </div>
+    </div> 
   );
 };

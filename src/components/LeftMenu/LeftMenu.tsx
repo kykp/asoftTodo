@@ -1,6 +1,6 @@
 import React, {useState, useEffect, MouseEvent} from 'react' 
 import { useAppSelector, useAppDispatch } from '../../hook' 
-import { filterBy } from '../../feauters/todo/todoSlice'
+import { filterBy,changeTask, deleteDragArray } from '../../feauters/todo/todoSlice'
 import { Popup } from './Popup' 
 import { ProjecPopup } from './ProjecPopup'
 import PenImg from "../../assets/icons/hamburger.png"
@@ -14,6 +14,7 @@ export const LeftMenu = () => {
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const projects = useAppSelector(state => state.todo.projects);  
   const filter = useAppSelector(state => state.todo.filters);  
+  const drag = useAppSelector(state => state.todo.drag);  
 
   const dispatch = useAppDispatch();     
  
@@ -41,13 +42,56 @@ export const LeftMenu = () => {
   useEffect(() => {
     setActiveButton(filter)
   },[filter])
+ 
+  const dragLeaveHandler = (e: any) =>{
+ 
+    
+  }
+  const dragEndHandler = (e: any) =>{
+ 
+  }
+
+  const dragOverHandler = (e: any) => {
+    e.preventDefault(); 
+  
+  }
+  const dropHandler = (e: any) => {
+    e.preventDefault();   
+    setNewStatusForDragItem(e.currentTarget.id); 
+    dispatch(filterBy(e.currentTarget.id))
+    
+  }
+
+  const setNewStatusForDragItem = ( project: string) => {    
+    let item = drag.at(-1); 
+    if (item){
+      dispatch(changeTask({
+        id: item.id, 
+        title: item.title,
+        status: item.status,   
+        project, 
+        archive: item.archive, 
+        deleted: item.deleted
+      })); 
+    } 
+    dispatch(deleteDragArray());
+    
+  }
 
   return ( 
         <div className='left-menu'>
           <h2>Проекты</h2>  
           <ul className='projects-list'>  
           {newProjects.map(el => ( 
-            <div  key={el.project} className='projects-list__cover'> 
+            <div 
+             id={el.id}
+             onDragOver={(e) => dragOverHandler(e)}
+             onDrop={(e) => dropHandler(e)}  
+             onDragLeave={(e) => dragLeaveHandler(e)}
+             onDragEnd={(e) => dragEndHandler(e)}
+            
+             key={el.project} 
+             className='projects-list__cover'> 
               <li title={el.project}className= {activeButton === el.id? "left-menu__button left-menu__button_active" : "left-menu__button"} id={el.id} onClick={(e) => onHandleCurrentProject(e)}>{el.project}</li>
               {activeButton === el.id &&
               el.id !== "incomming" &&  
