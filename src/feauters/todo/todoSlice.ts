@@ -32,7 +32,7 @@ type TodosState = {
 }
  
 export const fetchProjects = createAsyncThunk<Project[], void, {rejectValue: string}> ("todos/fetchProjects", async (_,{ rejectWithValue}) => {
-  const response = await fetch(`/projects/get`)
+  const response = await fetch(`projects/get`)
   if(!response.ok) {
     return rejectWithValue(`server error`)
   }
@@ -48,7 +48,7 @@ export const addProject = createAsyncThunk<Project, Project, {rejectValue: strin
     deleted,
     weight,
   }
-  const response = await fetch(`/projects/add`, {
+  const response = await fetch(`projects/add`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json', 
@@ -66,7 +66,7 @@ export const addProject = createAsyncThunk<Project, Project, {rejectValue: strin
 
 export const changeProjectTitle = createAsyncThunk<{project:string, id:string }, {project:string, id:string }, {rejectValue: string}>("todos/changeProjectTitle", 
 async ({project, id }, {rejectWithValue, dispatch}) => {
-  const response = await fetch(`/projects/change`, {
+  const response = await fetch(`projects/change`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json', 
@@ -84,7 +84,7 @@ async ({project, id }, {rejectWithValue, dispatch}) => {
 
 export const delProject = createAsyncThunk<string, string, {rejectValue: string}>("todos/delProject", async (id, {rejectWithValue, dispatch}) => {
    
-  const response = await fetch(`/projects/delete`, {
+  const response = await fetch(`projects/delete`, {
     method: "POST", 
     headers: {
       'Content-Type': 'application/json', 
@@ -100,7 +100,7 @@ export const delProject = createAsyncThunk<string, string, {rejectValue: string}
 });
 
 export const fetchTasks = createAsyncThunk<Todo[], void, {rejectValue: string}> ("todos/fetchTasks", async (_,{ rejectWithValue}) => {
-  const response = await fetch(`/tasks/get`)
+  const response = await fetch(`tasks/get`)
   if(!response.ok) {
     return rejectWithValue(`server error`)
   }
@@ -119,7 +119,7 @@ export const addTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todo
     deleted,
     weight
   }
-  const response = await fetch(`/tasks/add`, {
+  const response = await fetch(`tasks/add`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json', 
@@ -135,7 +135,7 @@ export const addTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todo
 });
 
 export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/changeTask", async ({id, title, status, project, archive, deleted, weight }, {rejectWithValue, dispatch},) => {  
-  const response = await fetch(`/tasks/change`, {
+  const response = await fetch(`tasks/change`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json', 

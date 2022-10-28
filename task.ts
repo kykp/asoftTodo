@@ -17,8 +17,7 @@ const getTasks = async (req: Request, res: Response) => {
     const { id, title, status, project, archive, deleted , weight} = req.body;  
     try {
       const newTask = new TaskSchema({
-        id, title, status, project, archive, deleted, weight
-      }); 
+        id, title, status, project, archive, deleted, weight }); 
       await newTask.save();
       res.json(newTask);
     } catch (error) { 
