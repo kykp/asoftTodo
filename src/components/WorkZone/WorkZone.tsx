@@ -13,18 +13,11 @@ type Todo = {
   archive: boolean,
   deleted: boolean,    
 }
-export const WorkZone  = () => {
-  const [currentPage, setCurrentPage]=useState("incomming")
-
+export const WorkZone  = () => { 
   const filter = useAppSelector(store => store.todo.filters);
   const todos = useAppSelector(store => store.todo.list);
   const dispatch = useAppDispatch();  
-
  
-  useEffect(()=>{
-    setCurrentPage(filter)
-  },[filter]) 
-
   const addTodoHandler = (e: any) => { 
     const todo = {
       id: uuidv4(),

@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react' 
+import React, {useState, useEffect, MouseEvent} from 'react' 
 import { useAppSelector, useAppDispatch } from '../../hook' 
 import { filterBy } from '../../feauters/todo/todoSlice'
 import { Popup } from './Popup' 
@@ -17,7 +17,7 @@ export const LeftMenu = () => {
 
   const dispatch = useAppDispatch();     
  
-  const onHandleCurrentProject = (e: any)=>{  
+  const onHandleCurrentProject = (e: any )=>{  
     setActiveButton(e.currentTarget.id);
     setCurrentProjectId(e.currentTarget.id);
     dispatch(filterBy(e.currentTarget.id))

@@ -11,13 +11,11 @@ const getProjects = async (req: Request, res: Response) => {
       res.json(projects);
     } catch (error) {
       console.log(error);
-    } finally {
-      console.log("we work")
     }
 };
 
 const addProject = async (req: Request, res: Response) => {
-    const { project, id, archive, deleted, weight } = req.body;  
+    const { project, id, archive, deleted, weight } = req.body;   
     try {
       const newProject = new ProjetSchema({
         project, id, archive, deleted, weight
