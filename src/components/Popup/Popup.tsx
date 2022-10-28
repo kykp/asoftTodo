@@ -17,6 +17,7 @@ interface PopupProps {
   project: string,
   archive: boolean,
   deleted: boolean,  
+  weight: number,
   onHandlePopup: () => void
 }
  
@@ -35,7 +36,8 @@ export const Popup: React.FC <PopupProps> = (props) => {
         archive: !currentObject?.archive, 
         deleted: false,
         title: props.title,
-        project: props.project
+        project: props.project,
+        weight: props.weight
       })) 
       :dispatch(changeTask({
         id: props.id, 
@@ -43,7 +45,8 @@ export const Popup: React.FC <PopupProps> = (props) => {
         archive: false, 
         deleted: !currentObject?.deleted,
         title: props.title,
-        project: props.project
+        project: props.project,
+        weight: props.weight
       })) 
     } else {
       dispatch(changeTask({
@@ -52,7 +55,8 @@ export const Popup: React.FC <PopupProps> = (props) => {
         archive: false, 
         deleted: false, 
         title: props.title,
-        project: props.project
+        project: props.project,
+        weight: props.weight
       })) 
     } 
     props.onHandlePopup();
@@ -93,12 +97,7 @@ export const Popup: React.FC <PopupProps> = (props) => {
           onClick={(event) => onChangeStatusHandler(event.currentTarget.id)}
           >Удалить</div>
 
-          <br /> 
-          {/* <div 
-          id=" " 
-          className='popup-inner__menu'
-          onClick={(event) => onChangeStatusHandler(event.currentTarget.id)}
-          >В другой проект</div> */}
+          <br />  
           </>
         )
         : null

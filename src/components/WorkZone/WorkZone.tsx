@@ -11,7 +11,8 @@ type Todo = {
   status: string,
   project: string,
   archive: boolean,
-  deleted: boolean,   
+  deleted: boolean, 
+  weight: number  
 }
 export const WorkZone  = () => {    
   const filter = useAppSelector(store => store.todo.filters);
@@ -28,6 +29,7 @@ export const WorkZone  = () => {
       project: filter,
       archive: false,
       deleted: false,
+      weight: 10
     }; 
     dispatch(addTask(todo));
   };
@@ -41,7 +43,8 @@ export const WorkZone  = () => {
         status,   
         project: item.project, 
         archive: item.archive, 
-        deleted: item.deleted
+        deleted: item.deleted,
+        weight: item.weight
       })); 
     } 
     dispatch(deleteDragArray());
@@ -74,20 +77,20 @@ export const WorkZone  = () => {
                   <Task   
                   key={el.id}   
                   setNewStatusForDragItem={setNewStatusForDragItem} 
-                  id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  
+                  id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}
                   />
                 )
               } else if (filter === "archive" && el.status === "inPlan" && el.archive){
                 return (
                   <Task
                   setNewStatusForDragItem={setNewStatusForDragItem} 
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}/>
                 )
               } else if (filter === "deleted" && el.status === "inPlan" && el.deleted){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} />
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight}/>
                 )
               }
             })}
@@ -118,19 +121,19 @@ export const WorkZone  = () => {
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}/>
                 )
               } else if (filter === "archive" && el.status === "inProcess" && el.archive){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} />
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight}/>
                 )
               } else if (filter === "deleted" && el.status === "inProcess" && el.deleted){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}/>
                 )
               }
             })}
@@ -156,19 +159,19 @@ export const WorkZone  = () => {
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight} />
                 )
               } else if (filter === "archive" && el.status === "done" && el.archive){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight} />
                 )
               } else if (filter === "deleted" && el.status === "done" && el.deleted){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  />
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight} />
                 )
               }
             })}

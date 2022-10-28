@@ -71,7 +71,8 @@ export const LeftMenu = () => {
         status: item.status,   
         project, 
         archive: item.archive, 
-        deleted: item.deleted
+        deleted: item.deleted,
+        weight: item.weight
       })); 
     } 
     dispatch(deleteDragArray());

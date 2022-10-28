@@ -10,7 +10,8 @@ type Todo = {
   status: string,
   project: string,
   archive: boolean,
-  deleted: boolean,  
+  deleted: boolean, 
+  weight: number 
 }
 
 type Project = {
@@ -31,7 +32,7 @@ type TodosState = {
 }
  
 export const fetchProjects = createAsyncThunk<Project[], void, {rejectValue: string}> ("todos/fetchProjects", async (_,{ rejectWithValue}) => {
-  const response = await fetch(`http://localhost:5000/projects/get`)
+  const response = await fetch(`/projects/get`)
   if(!response.ok) {
     return rejectWithValue(`server error`)
   }
@@ -47,7 +48,7 @@ export const addProject = createAsyncThunk<Project, Project, {rejectValue: strin
     deleted,
     weight,
   }
-  const response = await fetch(`http://localhost:5000/projects/add`, {
+  const response = await fetch(`/projects/add`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json', 
@@ -65,7 +66,7 @@ export const addProject = createAsyncThunk<Project, Project, {rejectValue: strin
 
 export const changeProjectTitle = createAsyncThunk<{project:string, id:string }, {project:string, id:string }, {rejectValue: string}>("todos/changeProjectTitle", 
 async ({project, id }, {rejectWithValue, dispatch}) => {
-  const response = await fetch(`http://localhost:5000/projects/change`, {
+  const response = await fetch(`/projects/change`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json', 
@@ -83,7 +84,7 @@ async ({project, id }, {rejectWithValue, dispatch}) => {
 
 export const delProject = createAsyncThunk<string, string, {rejectValue: string}>("todos/delProject", async (id, {rejectWithValue, dispatch}) => {
    
-  const response = await fetch(`http://localhost:5000/projects/delete`, {
+  const response = await fetch(`/projects/delete`, {
     method: "POST", 
     headers: {
       'Content-Type': 'application/json', 
@@ -99,7 +100,7 @@ export const delProject = createAsyncThunk<string, string, {rejectValue: string}
 });
 
 export const fetchTasks = createAsyncThunk<Todo[], void, {rejectValue: string}> ("todos/fetchTasks", async (_,{ rejectWithValue}) => {
-  const response = await fetch(`http://localhost:5000/tasks/get`)
+  const response = await fetch(`/tasks/get`)
   if(!response.ok) {
     return rejectWithValue(`server error`)
   }
@@ -108,16 +109,17 @@ export const fetchTasks = createAsyncThunk<Todo[], void, {rejectValue: string}> 
   return data;
 });
 
-export const addTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/addTask", async ({id, title, status, project, archive, deleted}, {rejectWithValue}) => {
+export const addTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/addTask", async ({id, title, status, project, archive, deleted, weight}, {rejectWithValue}) => {
   const newTask = {
     id,
     title,
     status,
     project,
     archive, 
-    deleted
+    deleted,
+    weight
   }
-  const response = await fetch(`http://localhost:5000/tasks/add`, {
+  const response = await fetch(`/tasks/add`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json', 
@@ -132,8 +134,8 @@ export const addTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todo
   return (await response.json()) as Todo; 
 });
 
-export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/changeTask", async ({id, title, status, project, archive, deleted }, {rejectWithValue, dispatch},) => {  
-  const response = await fetch(`http://localhost:5000/tasks/change`, {
+export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/changeTask", async ({id, title, status, project, archive, deleted, weight }, {rejectWithValue, dispatch},) => {  
+  const response = await fetch(`/tasks/change`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json', 
@@ -145,7 +147,7 @@ export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("t
     return rejectWithValue("cant add new project. Server Error")
   }
   
-  dispatch(changeTaskReducer({id, title, status, project, archive, deleted }))
+  dispatch(changeTaskReducer({id, title, status, project, archive, deleted, weight }))
   return (await response.json()) as Todo; 
 });
 
@@ -184,6 +186,7 @@ export const todoSlice = createSlice({
           currentTask.project = action.payload.project
           currentTask.archive = action.payload.archive
           currentTask.deleted = action.payload.deleted
+          currentTask.weight = action.payload.weight
         }
     },
     filterBy(state, action) {

@@ -1,4 +1,4 @@
-import express, { Request, Response} from "express";
+import express, { Request, Response} from "express"; 
 
 import TaskSchema from "./models/Tasks.js"
 
@@ -14,10 +14,10 @@ const getTasks = async (req: Request, res: Response) => {
   };
 
   const addTask = async (req: Request, res: Response) => {
-    const { id, title, status, project, archive, deleted } = req.body;  
+    const { id, title, status, project, archive, deleted , weight} = req.body;  
     try {
       const newTask = new TaskSchema({
-        id, title, status, project, archive, deleted
+        id, title, status, project, archive, deleted, weight
       }); 
       await newTask.save();
       res.json(newTask);
@@ -27,10 +27,10 @@ const getTasks = async (req: Request, res: Response) => {
   };
  
   const changeTask = async (req: Request, res: Response) => {
-    const { id, title, status, project, archive, deleted } = req.body;  
+    const { id, title, status, project, archive, deleted, weight } = req.body;  
     try {
-        await TaskSchema.findOneAndUpdate({id},{$set:{title, status, project, archive, deleted
-        }});  
+        await TaskSchema.findOneAndUpdate({id},{$set:{title, status, project, archive, deleted,
+          weight}});  
       res.json();
     } catch (error) { 
       console.log(error);

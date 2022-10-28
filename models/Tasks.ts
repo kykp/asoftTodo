@@ -7,6 +7,7 @@ export interface ITask extends Document {
     project: string,
     archive: boolean,
     deleted: boolean,  
+    weight: number,
 }
 
 const TaskSchema = new Schema({
@@ -16,6 +17,7 @@ const TaskSchema = new Schema({
     project: {type: String},
     archive: {type: Boolean},
     deleted: {type: Boolean},
+    weight: {type: Number}
 });
 
 export default mongoose.model<ITask>("Task", TaskSchema);

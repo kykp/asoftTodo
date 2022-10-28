@@ -12,11 +12,12 @@ interface Todo {
   project: string,
   archive: boolean,
   deleted: boolean,    
+  weight: number,
   setNewStatusForDragItem: (status: string) => void,
 }
  
 
-export const Task: React.FC<Todo> = ({ id, title, status, project, archive, deleted, setNewStatusForDragItem} ) => {  
+export const Task: React.FC<Todo> = ({ id, title, status, project, archive, deleted, weight, setNewStatusForDragItem} ) => {  
   const [taskTitle, setTaskTitle] = useState(title)
   const [showPopup, setShowPopup] = useState(false)
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
@@ -34,7 +35,7 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
   }
 
   const onChangeProjectTitle = () =>{  
-    dispatch(changeTask({project , id, archive, deleted, title: taskTitle, status}));
+    dispatch(changeTask({project , id, archive, deleted, title: taskTitle, status, weight}));
   }
 
   const onHandleChangeTitle = (e:any) => {
@@ -80,7 +81,8 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
         deleted={deleted}
         onHandlePopup={onHandlePopup}
         anchorPoint={anchorPoint}
-        trigger={showPopup}    
+        trigger={showPopup}  
+        weight={weight}  
        />
       </div>
 
