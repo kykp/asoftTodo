@@ -14,10 +14,11 @@ interface Todo {
   deleted: boolean,    
   weight: number,
   setNewStatusForDragItem: (status: string) => void,
+  changePlaceTask: (id: string) => void
 }
  
 
-export const Task: React.FC<Todo> = ({ id, title, status, project, archive, deleted, weight, setNewStatusForDragItem} ) => {  
+export const Task: React.FC<Todo> = ({ id, title, status, project, archive, deleted, weight, setNewStatusForDragItem, changePlaceTask} ) => {  
   const [taskTitle, setTaskTitle] = useState(title)
   const [showPopup, setShowPopup] = useState(false)
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
@@ -43,6 +44,7 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
     setTaskTitle(e.target.value) 
   }
 
+
  const dragStartHandler = (e:any) =>{   
   dispatch(addCurrentDragObject({ id, title, status, project, archive, deleted}))
   }
@@ -64,6 +66,7 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
   e.preventDefault();
   e.target.style.boxShadow = "none";   
   setNewStatusForDragItem(status);
+  changePlaceTask(id);
  } 
    
   return (  

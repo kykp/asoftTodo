@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React  from "react";
 import "./workzone.scss";
 import { useAppDispatch, useAppSelector } from "../../hook";
 import { addTask, changeTask, deleteDragArray } from "../../feauters/todo/todoSlice";
@@ -19,7 +19,7 @@ export const WorkZone  = () => {
   const todos = useAppSelector(store => store.todo.list);
   const drag = useAppSelector(store => store.todo.drag); 
   const dispatch = useAppDispatch();  
- 
+  
   
   const addTodoHandler = (e: any) => { 
     const todo = {
@@ -59,7 +59,34 @@ export const WorkZone  = () => {
     setNewStatusForDragItem(e.currentTarget.id) 
   }
 
-  console.log(drag)
+  const changePlaceTask = (id: string) =>{
+    if (drag.at(-1)?.id === id){
+      console.log("сам на себя")
+    }  
+
+    const secondTask = todos.filter(todo => todo.id === id);
+
+    let item = drag.at(-1);
+
+    if (item){
+      console.log("worker", secondTask[0].weight)
+      dispatch(changeTask({
+        id: item.id, 
+        title: item.title,
+        status: item.status,   
+        project: item.project, 
+        archive: item.archive, 
+        deleted: item.deleted,
+        weight: secondTask[0].weight -1
+      })); 
+    } 
+    dispatch(deleteDragArray());
+ 
+  } 
+
+  const filterdTodos = [...todos].sort((a,b)=> a.weight-b.weight);  
+
+  console.log(filterdTodos)
   return ( 
     <div className="workzone">
       <div className="tasks" >
@@ -71,12 +98,13 @@ export const WorkZone  = () => {
         > 
           <div className="task task__planing"> 
             <h3 className="task__title">Запланировано</h3>
-            {todos.map((el: Todo) => {  
+            {filterdTodos.map((el: Todo) => {  
               if (el.status === "inPlan" && el.project === filter && !el.archive && !el.deleted ) {
                 return (
                   <Task   
                   key={el.id}   
                   setNewStatusForDragItem={setNewStatusForDragItem} 
+                  changePlaceTask={changePlaceTask}
                   id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}
                   />
                 )
@@ -84,12 +112,14 @@ export const WorkZone  = () => {
                 return (
                   <Task
                   setNewStatusForDragItem={setNewStatusForDragItem} 
+                  changePlaceTask={changePlaceTask}
                   key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}/>
                 )
               } else if (filter === "deleted" && el.status === "inPlan" && el.deleted){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
+                  changePlaceTask={changePlaceTask}
                   key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight}/>
                 )
               }
@@ -121,18 +151,21 @@ export const WorkZone  = () => {
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
+                  changePlaceTask={changePlaceTask}
                   key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}/>
                 )
               } else if (filter === "archive" && el.status === "inProcess" && el.archive){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
+                  changePlaceTask={changePlaceTask}
                   key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight}/>
                 )
               } else if (filter === "deleted" && el.status === "inProcess" && el.deleted){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
+                  changePlaceTask={changePlaceTask}
                   key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}/>
                 )
               }
@@ -159,18 +192,21 @@ export const WorkZone  = () => {
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
+                  changePlaceTask={changePlaceTask}
                   key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight} />
                 )
               } else if (filter === "archive" && el.status === "done" && el.archive){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
+                  changePlaceTask={changePlaceTask}
                   key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight} />
                 )
               } else if (filter === "deleted" && el.status === "done" && el.deleted){
                 return (
                   <Task 
                   setNewStatusForDragItem={setNewStatusForDragItem} 
+                  changePlaceTask={changePlaceTask}
                   key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight} />
                 )
               }

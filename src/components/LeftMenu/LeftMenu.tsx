@@ -57,9 +57,7 @@ export const LeftMenu = () => {
   }
   const dropHandler = (e: any) => {
     e.preventDefault();   
-    setNewStatusForDragItem(e.currentTarget.id); 
-    dispatch(filterBy(e.currentTarget.id))
-    
+    setNewStatusForDragItem(e.currentTarget.id);   
   }
 
   const setNewStatusForDragItem = ( project: string) => {    
