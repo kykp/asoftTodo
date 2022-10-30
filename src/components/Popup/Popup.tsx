@@ -17,7 +17,7 @@ interface PopupProps {
   project: string,
   archive: boolean,
   deleted: boolean,  
-  weight: number,
+  order: number, 
   onHandlePopup: () => void
 }
  
@@ -36,8 +36,8 @@ export const Popup: React.FC <PopupProps> = (props) => {
         archive: !currentObject?.archive, 
         deleted: false,
         title: props.title,
-        project: props.project,
-        weight: props.weight
+        project: props.project, 
+        order: props.order,
       })) 
       :dispatch(changeTask({
         id: props.id, 
@@ -45,8 +45,8 @@ export const Popup: React.FC <PopupProps> = (props) => {
         archive: false, 
         deleted: !currentObject?.deleted,
         title: props.title,
-        project: props.project,
-        weight: props.weight
+        project: props.project, 
+        order: props.order,
       })) 
     } else {
       dispatch(changeTask({
@@ -55,8 +55,8 @@ export const Popup: React.FC <PopupProps> = (props) => {
         archive: false, 
         deleted: false, 
         title: props.title,
-        project: props.project,
-        weight: props.weight
+        project: props.project, 
+        order: props.order,
       })) 
     } 
     props.onHandlePopup();

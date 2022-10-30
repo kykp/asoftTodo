@@ -1,9 +1,10 @@
-import React, {useState }  from 'react'
-import { useAppDispatch } from '../../hook'
-import {changeTask, changeTodoTitle, addCurrentDragObject} from "../../feauters/todo/todoSlice" 
+import React, {useState, useEffect }  from 'react'
+import { useAppDispatch, useAppSelector} from '../../hook'
+import {changeTask, changeTodoTitle, addDragObject, addDropObject, changeOrderTodos, clearDragArray, clearDropArray   } from "../../feauters/todo/todoSlice" 
 import GambIcon from "../../assets/icons/hamburger.png"
 import "./task.scss"; 
-import  {Popup}  from "../Popup/Popup"  
+import  {Popup}  from "../Popup/Popup"   
+ 
 
 interface Todo { 
   id: string,
@@ -11,22 +12,20 @@ interface Todo {
   status: string,
   project: string,
   archive: boolean,
-  deleted: boolean,    
-  weight: number,
+  deleted: boolean,  
+  order: number, 
   setNewStatusForDragItem: (status: string) => void,
-  changePlaceTask: (id: string) => void
 }
  
 
-export const Task: React.FC<Todo> = ({ id, title, status, project, archive, deleted, weight, setNewStatusForDragItem, changePlaceTask} ) => {  
+export const Task: React.FC<Todo> = ({ id, title, status, project, archive, deleted, order,  setNewStatusForDragItem  } ) => {  
   const [taskTitle, setTaskTitle] = useState(title)
   const [showPopup, setShowPopup] = useState(false)
-  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
- 
+  const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });   
+  const dragItem = useAppSelector(store => store.todo.dragItem);  
+  const dropItem = useAppSelector(store => store.todo.dropItem);  
+  const dispatch = useAppDispatch();  
 
-  const dispatch = useAppDispatch(); 
- 
-   
   const onHandlePopup = () => {
     setShowPopup(!showPopup)
   }
@@ -36,7 +35,7 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
   }
 
   const onChangeProjectTitle = () =>{  
-    dispatch(changeTask({project , id, archive, deleted, title: taskTitle, status, weight}));
+    dispatch(changeTask({project , id, archive, deleted, title: taskTitle, status, order }));
   }
 
   const onHandleChangeTitle = (e:any) => {
@@ -44,37 +43,45 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
     setTaskTitle(e.target.value) 
   }
 
-
- const dragStartHandler = (e:any) =>{   
-  dispatch(addCurrentDragObject({ id, title, status, project, archive, deleted}))
+ const dragStartHandler = () =>{    
+  dispatch(addDragObject({ id }))  
   }
 
  const dragEndHandler = (e:any) =>{ 
-  e.target.style.boxShadow = "none"
+  e.target.style.boxShadow = "1px 1px 0px 1px rgb(0 0 0 / 51%)"
  }
  const dragLeaveHandler = (e:any) =>{ 
-  e.target.style.boxShadow = "none"
+  e.target.style.boxShadow = "1px 1px 0px 1px rgb(0 0 0 / 51%)"
  }
- const dragOverHandler = (e:any) =>{
-  e.preventDefault();
-  if (e.target.className === "task-container__text") {
-    e.target.style.boxShadow = "0 4px 3px black"
-  } 
+ const dragOverHandler = (e:any) =>{ 
+  e.preventDefault(); 
+  const targetClass = e.target.className;
+  const targetStyle =  e.target.style.boxShadow = "0 4px 3px black"; 
+  const currentClass = "task-container__text";
+  targetClass ===  currentClass ? targetStyle : null; 
  }
  
- const dropHandler = (e:any,  ) =>{ 
+ const dropHandler = (e:any,  ) =>{  
   e.preventDefault();
-  e.target.style.boxShadow = "none";   
-  setNewStatusForDragItem(status);
-  changePlaceTask(id);
+  e.target.style.boxShadow = "1px 1px 0px 1px rgb(0 0 0 / 51%)";  
+  dispatch(addDropObject({id}))  
+  setNewStatusForDragItem(status);    
  } 
    
-  return (  
-    <div 
-      className='task-container' 
-    >  
+ useEffect(() => {
+    const firstItem = dragItem.at(-1);
+    const secondItem = dropItem.at(-1);
+
+    if (firstItem && secondItem){ 
+      dispatch(changeOrderTodos({first: firstItem, second: secondItem}))
+      dispatch(clearDragArray()), dispatch(clearDropArray());
+    }
+  },[dragItem, dropItem])
+
+  return (   
+    <div className='task-container'>  
       <div className='task-container__header'>
-       <img id={id}  src={GambIcon} alt="" onClick={(event)=> onHamburgerClick(event)}/>
+       <img id={id}  src={GambIcon} alt={title} onClick={(event)=> onHamburgerClick(event)}/>
        <Popup 
         id={id}
         title={title}
@@ -84,29 +91,28 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
         deleted={deleted}
         onHandlePopup={onHandlePopup}
         anchorPoint={anchorPoint}
-        trigger={showPopup}  
-        weight={weight}  
+        trigger={showPopup}   
+        order= {order}
        />
-      </div>
-
+      </div> 
       <textarea   
-       onDragStart={(e) => dragStartHandler(e)}
-       onDragLeave={(e) => dragLeaveHandler(e)}
-       onDragEnd={(e) => dragEndHandler(e)}
-       onDragOver={(e) => dragOverHandler(e)}
-       onDrop={(e) => dropHandler(e)}
-       draggable={true}
+          onDragStart={() => dragStartHandler()}
+          onDragLeave={(e) => dragLeaveHandler(e)}
+          onDragEnd={(e) => dragEndHandler(e)}
+          onDragOver={(e) => dragOverHandler(e)}
+          onDrop={(e) => dropHandler(e)}
+          draggable={true}
           className = "task-container__text" 
           placeholder= "Ввести заголовок для этой карточки" 
-          name="" 
+          name={taskTitle}
           id={id} 
           value={taskTitle} 
           onChange={(e)=>  onHandleChangeTitle(e)} 
-          onBlur={onChangeProjectTitle}
+          // onBlur={onChangeProjectTitle} 
           cols ={30}
           rows ={3}>
             {title}
           </textarea> 
-    </div> 
+    </div>  
   )
 }

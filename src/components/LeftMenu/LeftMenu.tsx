@@ -1,6 +1,6 @@
 import React, {useState, useEffect, MouseEvent} from 'react' 
 import { useAppSelector, useAppDispatch } from '../../hook' 
-import { filterBy,changeTask, deleteDragArray } from '../../feauters/todo/todoSlice'
+import { filterBy,changeTask, clearDragArray } from '../../feauters/todo/todoSlice'
 import { Popup } from './Popup' 
 import { ProjecPopup } from './ProjecPopup'
 import PenImg from "../../assets/icons/hamburger.png"
@@ -14,7 +14,7 @@ export const LeftMenu = () => {
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const projects = useAppSelector(state => state.todo.projects);  
   const filter = useAppSelector(state => state.todo.filters);  
-  const drag = useAppSelector(state => state.todo.drag);  
+  const drag = useAppSelector(state => state.todo.dragItem);  
 
   const dispatch = useAppDispatch();     
  
@@ -35,6 +35,7 @@ export const LeftMenu = () => {
   } 
 
   let newProjects = [...projects].sort((a,b)=> a.weight - b.weight); 
+
   const onHandleLeftMenuProjectsClick = (event: any ) =>{
     setAnchorPoint({ x: event.pageX, y: event.pageY }); 
   }
@@ -42,18 +43,9 @@ export const LeftMenu = () => {
   useEffect(() => {
     setActiveButton(filter)
   },[filter])
- 
-  const dragLeaveHandler = (e: any) =>{
- 
-    
-  }
-  const dragEndHandler = (e: any) =>{
- 
-  }
-
-  const dragOverHandler = (e: any) => {
-    e.preventDefault(); 
   
+  const dragOverHandler = (e: any) => {
+    e.preventDefault();  
   }
   const dropHandler = (e: any) => {
     e.preventDefault();   
@@ -62,21 +54,9 @@ export const LeftMenu = () => {
 
   const setNewStatusForDragItem = ( project: string) => {    
     let item = drag.at(-1); 
-    if (item){
-      dispatch(changeTask({
-        id: item.id, 
-        title: item.title,
-        status: item.status,   
-        project, 
-        archive: item.archive, 
-        deleted: item.deleted,
-        weight: item.weight
-      })); 
-    } 
-    dispatch(deleteDragArray());
-    
-  }
-
+    item? dispatch(changeTask({...item, project})): null; 
+    dispatch(clearDragArray()); 
+  } 
   return ( 
         <div className='left-menu'>
           <h2>Проекты</h2>  
@@ -85,9 +65,7 @@ export const LeftMenu = () => {
             <div 
              id={el.id}
              onDragOver={(e) => dragOverHandler(e)}
-             onDrop={(e) => dropHandler(e)}  
-             onDragLeave={(e) => dragLeaveHandler(e)}
-             onDragEnd={(e) => dragEndHandler(e)}
+             onDrop={(e) => dropHandler(e)}   
             
              key={el.project} 
              className='projects-list__cover'> 
@@ -127,7 +105,7 @@ export const LeftMenu = () => {
               trigger={showPopupProject}
               anchorPoint={anchorPoint} 
               onHandlePopupProject={onHandlePopupProject} 
-              id={currentProjectId} 
+              id={currentProjectId}  
               />
         </div> 
   )

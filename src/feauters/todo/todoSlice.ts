@@ -10,8 +10,8 @@ type Todo = {
   status: string,
   project: string,
   archive: boolean,
-  deleted: boolean, 
-  weight: number 
+  deleted: boolean,  
+  order: number,
 }
 
 type Project = {
@@ -19,13 +19,14 @@ type Project = {
   id: string,
   archive: boolean,
   deleted: boolean,
-  weight:number,
+  weight: number,
 }
  
 type TodosState = {
   list: Todo[] , 
   projects: Project[],
-  drag: Todo[],
+  dragItem: Todo[], 
+  dropItem: Todo[]
   filters: string, 
   loading: boolean,
   error: string | null, 
@@ -40,13 +41,13 @@ export const fetchProjects = createAsyncThunk<Project[], void, {rejectValue: str
   return data;
 });
 
-export const addProject = createAsyncThunk<Project, Project, {rejectValue: string}>("todos/addProject", async ({project, id, archive,  deleted,  weight, }, {rejectWithValue}) => {
+export const addProject = createAsyncThunk<Project, Project, {rejectValue: string}>("todos/addProject", async ({project, id, archive,  deleted,  weight }, {rejectWithValue}) => {
   const newProject = {
     project,
     id,
     archive,
     deleted,
-    weight,
+    weight
   }
   const response = await fetch(`http://localhost:5000/projects/add`, {
     method: "POST",
@@ -95,6 +96,7 @@ export const delProject = createAsyncThunk<string, string, {rejectValue: string}
   if(!response.ok) {
     return rejectWithValue("cant add new project. Server Error")
   } 
+  dispatch(clearProject({project: id}))
   dispatch(filterBy("incomming"));
   return id
 });
@@ -109,15 +111,15 @@ export const fetchTasks = createAsyncThunk<Todo[], void, {rejectValue: string}> 
   return data;
 });
 
-export const addTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/addTask", async ({id, title, status, project, archive, deleted, weight}, {rejectWithValue}) => {
+export const addTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/addTask", async ({id, title, status, project, archive, deleted , order }, {rejectWithValue}) => {
   const newTask = {
     id,
     title,
     status,
     project,
     archive, 
-    deleted,
-    weight
+    deleted, 
+    order
   }
   const response = await fetch(`http://localhost:5000/tasks/add`, {
     method: "POST",
@@ -134,20 +136,20 @@ export const addTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todo
   return (await response.json()) as Todo; 
 });
 
-export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/changeTask", async ({id, title, status, project, archive, deleted, weight }, {rejectWithValue, dispatch},) => {  
+export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("todos/changeTask", async ({id, title, status, project, archive, deleted, order }, {rejectWithValue, dispatch},) => {  
   const response = await fetch(`http://localhost:5000/tasks/change`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json', 
     }, 
-    body: JSON.stringify({id, title, status, project, archive, deleted, weight })   
+    body: JSON.stringify({id, title, status, project, archive, deleted , order })   
   });
 
   if(!response.ok) {
     return rejectWithValue("cant add new project. Server Error")
   }
   
-  dispatch(changeTaskReducer({id, title, status, project, archive, deleted, weight }))
+  dispatch(changeTaskReducer({id, title, status, project, archive, deleted, order }))
   return (await response.json()) as Todo; 
 });
 
@@ -155,7 +157,8 @@ export const changeTask = createAsyncThunk<Todo, Todo, {rejectValue: string}>("t
 const initialState : TodosState = {
   projects: [],
   list: [], 
-  drag: [],
+  dragItem: [],
+  dropItem: [],
   filters: filters.filter,
   loading: false,
   error: null, 
@@ -164,12 +167,42 @@ const initialState : TodosState = {
 export const todoSlice = createSlice({
   name: "todos",
   initialState,
-  reducers: { 
-    addCurrentDragObject:(state, action) => {
-      state.drag.push(action.payload);
+  reducers: {  
+    changeOrderTodos: (state, action: PayloadAction<{first: Todo, second: Todo}>) => {  
+      // const firstItemOrder = action.payload.first.order;
+      // const secondItemOrder = action.payload.second.order;
+
+      // state.list.map(el => {
+      //   if (el.id === action.payload.first.id){
+      //     el.order = secondItemOrder;
+      //   }
+      //   if (el.id === action.payload.second.id){
+      //     el.order = firstItemOrder;
+      //   }  
+      // })
+      // state.list.sort((a,b)=> a.order - b.order);
     },
-    deleteDragArray: (state) =>{
-      state.drag = []
+    addDragObject:(state, action:  PayloadAction<{id: string}>) => {
+      const item = state.list.find(el => el.id === action.payload.id); 
+      if (item){
+        state.dragItem.push(item);
+      }
+    }, 
+    addDropObject:(state, action: PayloadAction<{id: string}>) => {
+      const item = state.list.find(el => el.id === action.payload.id); 
+      if (item){
+        state.dropItem.push(item);
+      } 
+      }, 
+    clearDragArray: (state) =>{
+      // state.dragItem = []
+    },
+    clearDropArray: (state) => {
+      // state.dropItem = []
+    },
+    clearProject: (state, action: PayloadAction<{project: string}>) => {
+     const newTaskList = state.list.filter(task => task.project !== action.payload.project);
+     state.list = newTaskList;
     },
     changeTodoTitle: (state, action: PayloadAction<{id:string, title: string}>) => { 
      const currentTask = state.list.find(task => task.id === action.payload.id)
@@ -178,15 +211,9 @@ export const todoSlice = createSlice({
      }
     },
     changeTaskReducer:(state, action: PayloadAction<Todo>) => {
-      const currentTask = state.list.find(task => task.id === action.payload.id)
-        if(currentTask){  
-          currentTask.id = action.payload.id
-          currentTask.title = action.payload.title
-          currentTask.status = action.payload.status
-          currentTask.project = action.payload.project
-          currentTask.archive = action.payload.archive
-          currentTask.deleted = action.payload.deleted
-          currentTask.weight = action.payload.weight
+      let currentTask = state.list.find(task => task.id === action.payload.id) 
+        if(currentTask){    
+          currentTask = Object.assign(currentTask, action.payload) 
         }
     },
     filterBy:(state, action) => {
@@ -232,7 +259,7 @@ export const todoSlice = createSlice({
    
 });
 
-export const { changeTodoTitle, changeProjectName,  changeTaskReducer, filterBy, addCurrentDragObject ,deleteDragArray   } = todoSlice.actions;
+export const { changeTodoTitle, changeProjectName,  changeTaskReducer, filterBy, addDragObject , addDropObject, clearDragArray, clearDropArray, clearProject, changeOrderTodos, changeOrderTodos2  } = todoSlice.actions;
 export default todoSlice.reducer;
 
 function isError(action: AnyAction) {

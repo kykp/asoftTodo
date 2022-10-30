@@ -1,9 +1,9 @@
-import React  from "react";
+import React, { useEffect, useState }  from "react";
 import "./workzone.scss";
 import { useAppDispatch, useAppSelector } from "../../hook";
-import { addTask, changeTask, deleteDragArray } from "../../feauters/todo/todoSlice";
+import { addTask, changeTask, clearDragArray, changeOrderTodos, clearDropArray } from "../../feauters/todo/todoSlice";
 import { v4 as uuidv4 } from "uuid";
-import { Task } from "../../components/Task/Task";      
+import { Task } from "../../components/Task/Task";     
 
 type Todo = {
   id: string,
@@ -11,131 +11,88 @@ type Todo = {
   status: string,
   project: string,
   archive: boolean,
-  deleted: boolean, 
-  weight: number  
+  deleted: boolean,  
+  order: number,
 }
 export const WorkZone  = () => {    
   const filter = useAppSelector(store => store.todo.filters);
   const todos = useAppSelector(store => store.todo.list);
-  const drag = useAppSelector(store => store.todo.drag); 
-  const dispatch = useAppDispatch();  
-  
-  
-  const addTodoHandler = (e: any) => { 
+  const dragItem = useAppSelector(store => store.todo.dragItem);  
+  const dropItem = useAppSelector(store => store.todo.dropItem);  
+  const dispatch = useAppDispatch();    
+
+  const addTaskHandler = (e: any) => { 
     const todo = {
       id: uuidv4(),
       title: "",
       status: e.currentTarget.id,
       project: filter,
       archive: false,
-      deleted: false,
-      weight: 10
+      deleted: false, 
+      order: todos.length+1,
     }; 
     dispatch(addTask(todo));
   };
-   
-  const setNewStatusForDragItem = ( status: string) => {    
-    let item = drag.at(-1);
-    if (item){
-      dispatch(changeTask({
-        id: item.id, 
-        title: item.title,
-        status,   
-        project: item.project, 
-        archive: item.archive, 
-        deleted: item.deleted,
-        weight: item.weight
-      })); 
-    } 
-    dispatch(deleteDragArray());
+    
+  const setNewStatusForDragItem = (status: string) => {    
+    const firstItem = dragItem.at(-1);   
+    firstItem ? dispatch(changeTask({...firstItem, status})): null; 
   }
-
-
-  const dragOverHandler = (e: any) => {
-    e.preventDefault(); 
-  }
-  const dropHandler = (e: any) => {
-    e.preventDefault(); 
-    setNewStatusForDragItem(e.currentTarget.id) 
-  }
-
-  const changePlaceTask = (id: string) =>{
-    if (drag.at(-1)?.id === id){
-      console.log("сам на себя")
-    }  
-
-    const secondTask = todos.filter(todo => todo.id === id);
-
-    let item = drag.at(-1);
-
-    if (item){
-      console.log("worker", secondTask[0].weight)
-      dispatch(changeTask({
-        id: item.id, 
-        title: item.title,
-        status: item.status,   
-        project: item.project, 
-        archive: item.archive, 
-        deleted: item.deleted,
-        weight: secondTask[0].weight -1
-      })); 
-    } 
-    dispatch(deleteDragArray());
  
-  } 
-
-  const filterdTodos = [...todos].sort((a,b)=> a.weight-b.weight);  
-
-  console.log(filterdTodos)
-  return ( 
+  const dragOverHandler = (e: any) => {
+    e.preventDefault();  
+  }
+  const dropHandler = (e: any) => { 
+    e.preventDefault();  
+    setNewStatusForDragItem(e.currentTarget.id);  
+  }  
+    
+  console.log(todos.map(el => console.log(el.title, el.order)))
+  return (  
     <div className="workzone">
       <div className="tasks" >
         <div  
           className="tasks__item" 
-          id="inPlan" 
+          id="inPlan"  
           onDragOver={(e) => dragOverHandler(e)}
           onDrop={(e) => dropHandler(e)} 
         > 
           <div className="task task__planing"> 
-            <h3 className="task__title">Запланировано</h3>
-            {filterdTodos.map((el: Todo) => {  
+            <h3 className="task__title">Запланировано</h3>  
+            {todos.map((el: Todo) => {  
               if (el.status === "inPlan" && el.project === filter && !el.archive && !el.deleted ) {
                 return (
                   <Task   
-                  key={el.id}   
-                  setNewStatusForDragItem={setNewStatusForDragItem} 
-                  changePlaceTask={changePlaceTask}
-                  id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}
+                  key={el.id} 
+                  setNewStatusForDragItem={setNewStatusForDragItem}  
+                  id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  order={el.order} 
                   />
                 )
               } else if (filter === "archive" && el.status === "inPlan" && el.archive){
                 return (
                   <Task
-                  setNewStatusForDragItem={setNewStatusForDragItem} 
-                  changePlaceTask={changePlaceTask}
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}/>
+                  setNewStatusForDragItem={setNewStatusForDragItem}  
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} order={el.order}  />
                 )
               } else if (filter === "deleted" && el.status === "inPlan" && el.deleted){
                 return (
                   <Task 
-                  setNewStatusForDragItem={setNewStatusForDragItem} 
-                  changePlaceTask={changePlaceTask}
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight}/>
+                  setNewStatusForDragItem={setNewStatusForDragItem}  
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  order={el.order} />
                 )
               }
-            })}
+            })}  
           </div>  
             { 
             filter !== "archive" && filter !== "deleted" ?
              (<button 
              id="inPlan" 
              className="tasks__button" 
-             onClick={(e) => addTodoHandler(e)}> 
+             onClick={(e) => addTaskHandler(e)}> 
                    Добавить задачу
            </button>)
            : null
             } 
-
         </div>
 
         <div 
@@ -150,30 +107,27 @@ export const WorkZone  = () => {
               if (el.status === "inProcess" && el.project === filter && !el.archive && !el.deleted ) {
                 return (
                   <Task 
-                  setNewStatusForDragItem={setNewStatusForDragItem} 
-                  changePlaceTask={changePlaceTask}
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}/>
+                  setNewStatusForDragItem={setNewStatusForDragItem}  
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} order={el.order}   />
                 )
               } else if (filter === "archive" && el.status === "inProcess" && el.archive){
                 return (
                   <Task 
-                  setNewStatusForDragItem={setNewStatusForDragItem} 
-                  changePlaceTask={changePlaceTask}
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight}/>
+                  setNewStatusForDragItem={setNewStatusForDragItem}  
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} order={el.order} />
                 )
               } else if (filter === "deleted" && el.status === "inProcess" && el.deleted){
                 return (
                   <Task 
-                  setNewStatusForDragItem={setNewStatusForDragItem} 
-                  changePlaceTask={changePlaceTask}
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  weight={el.weight}/>
+                  setNewStatusForDragItem={setNewStatusForDragItem}  
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} order={el.order}  />
                 )
               }
             })}
           </div>
           {
             filter !== "archive" && filter !== "deleted" ?
-            <button id="inProcess" className="tasks__button" onClick={(e) => addTodoHandler(e)}> Добавить задачу</button>
+            <button id="inProcess" className="tasks__button" onClick={(e) => addTaskHandler(e)}> Добавить задачу</button>
             : null
           }
           
@@ -191,34 +145,31 @@ export const WorkZone  = () => {
               if (el.status === "done" && el.project === filter && !el.archive && !el.deleted ) {
                 return (
                   <Task 
-                  setNewStatusForDragItem={setNewStatusForDragItem} 
-                  changePlaceTask={changePlaceTask}
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight} />
+                  setNewStatusForDragItem={setNewStatusForDragItem}  
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted}  order={el.order}  />
                 )
               } else if (filter === "archive" && el.status === "done" && el.archive){
                 return (
                   <Task 
-                  setNewStatusForDragItem={setNewStatusForDragItem} 
-                  changePlaceTask={changePlaceTask}
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight} />
+                  setNewStatusForDragItem={setNewStatusForDragItem}  
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} order={el.order}  />
                 )
               } else if (filter === "deleted" && el.status === "done" && el.deleted){
                 return (
                   <Task 
-                  setNewStatusForDragItem={setNewStatusForDragItem} 
-                  changePlaceTask={changePlaceTask}
-                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} weight={el.weight} />
+                  setNewStatusForDragItem={setNewStatusForDragItem}  
+                  key={el.id} id={el.id} title={el.title} status={el.status} project ={el.project} archive={el.archive} deleted= {el.deleted} order={el.order}  />
                 )
               }
             })}
           </div>
           {
           filter !== "archive" && filter !== "deleted" ?
-          <button id="done" className="tasks__button" onClick={(e) => addTodoHandler(e)}> Добавить задачу</button>
+          <button id="done" className="tasks__button" onClick={(e) => addTaskHandler(e)}> Добавить задачу</button>
           : null
         } 
         </div>
       </div>
-    </div> 
+    </div>  
   );
 };

@@ -14,10 +14,10 @@ const getTasks = async (req: Request, res: Response) => {
   };
 
   const addTask = async (req: Request, res: Response) => {
-    const { id, title, status, project, archive, deleted , weight} = req.body;  
+    const { id, title, status, project, archive, deleted, order} = req.body;  
     try {
       const newTask = new TaskSchema({
-        id, title, status, project, archive, deleted, weight }); 
+        id, title, status, project, archive, deleted , order }); 
       await newTask.save();
       res.json(newTask);
     } catch (error) { 
@@ -26,10 +26,9 @@ const getTasks = async (req: Request, res: Response) => {
   };
  
   const changeTask = async (req: Request, res: Response) => {
-    const { id, title, status, project, archive, deleted, weight } = req.body;  
+    const { id, title, status, project, archive, deleted , order   } = req.body;  
     try {
-        await TaskSchema.findOneAndUpdate({id},{$set:{title, status, project, archive, deleted,
-          weight}});  
+        await TaskSchema.findOneAndUpdate({id},{$set:{title, status, project, archive, deleted, order }});  
       res.json();
     } catch (error) { 
       console.log(error);

@@ -2,9 +2,10 @@
 
 .header {  
     min-height: 5vh;
-    background-color: $bgColorMain; 
+    background: rgb(134, 179, 245);
     border-radius: 15px;
     border-bottom-left-radius: 0px; 
+    
 }
 
 @media screen and (max-width: 600px) {

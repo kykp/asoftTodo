@@ -8,7 +8,7 @@ import { useAppDispatch } from "./hook";
 
 
 function App() {
-  const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();  
 
   useEffect(() => {
     dispatch(fetchProjects());
