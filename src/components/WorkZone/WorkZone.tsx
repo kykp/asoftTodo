@@ -1,7 +1,7 @@
-import React, { useEffect, useState }  from "react";
+import React from "react";
 import "./workzone.scss";
 import { useAppDispatch, useAppSelector } from "../../hook";
-import { addTask, changeTask, clearDragArray, changeOrderTodos, clearDropArray } from "../../feauters/todo/todoSlice";
+import { addTask, changeTaskStatus } from "../../feauters/todo/todoSlice";
 import { v4 as uuidv4 } from "uuid";
 import { Task } from "../../components/Task/Task";     
 
@@ -35,8 +35,10 @@ export const WorkZone  = () => {
   };
     
   const setNewStatusForDragItem = (status: string) => {    
-    const firstItem = dragItem.at(-1);   
-    firstItem ? dispatch(changeTask({...firstItem, status})): null; 
+    const firstItem = dragItem.at(-1);  
+    if (firstItem?.status !== status) {
+      firstItem? dispatch(changeTaskStatus({id: firstItem?.id, status})):null
+    }   
   }
  
   const dragOverHandler = (e: any) => {
@@ -46,8 +48,7 @@ export const WorkZone  = () => {
     e.preventDefault();  
     setNewStatusForDragItem(e.currentTarget.id);  
   }  
-    
-  console.log(todos.map(el => console.log(el.title, el.order)))
+     
   return (  
     <div className="workzone">
       <div className="tasks" >

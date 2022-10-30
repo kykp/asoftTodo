@@ -1,6 +1,6 @@
 import React, {useState, useEffect }  from 'react'
 import { useAppDispatch, useAppSelector} from '../../hook'
-import {changeTask, changeTodoTitle, addDragObject, addDropObject, changeOrderTodos, clearDragArray, clearDropArray   } from "../../feauters/todo/todoSlice" 
+import {changeTaskTitle, addDragObject, addDropObject, changeOrderTodos, clearDragArray, clearDropArray     } from "../../feauters/todo/todoSlice" 
 import GambIcon from "../../assets/icons/hamburger.png"
 import "./task.scss"; 
 import  {Popup}  from "../Popup/Popup"   
@@ -34,15 +34,13 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
     setShowPopup(!showPopup)
   }
 
-  const onChangeProjectTitle = () =>{  
-    dispatch(changeTask({project , id, archive, deleted, title: taskTitle, status, order }));
-  }
-
-  const onHandleChangeTitle = (e:any) => {
-    dispatch(changeTodoTitle({id, title: e.target.value}));
-    setTaskTitle(e.target.value) 
-  }
-
+  const onHandleChangeTitle = (e:any) => { 
+    setTaskTitle(e.target.value)
+    
+  } 
+  useEffect(() => {
+    dispatch(changeTaskTitle({id, title:taskTitle}));
+  },[taskTitle])
  const dragStartHandler = () =>{    
   dispatch(addDragObject({ id }))  
   }
@@ -63,20 +61,19 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
  
  const dropHandler = (e:any,  ) =>{  
   e.preventDefault();
-  e.target.style.boxShadow = "1px 1px 0px 1px rgb(0 0 0 / 51%)";  
-  dispatch(addDropObject({id}))  
-  setNewStatusForDragItem(status);    
+  e.target.style.boxShadow = "1px 1px 0px 1px rgb(0 0 0 / 51%)";   
+  dispatch(addDropObject({id}));
+  setNewStatusForDragItem(status);
  } 
    
  useEffect(() => {
     const firstItem = dragItem.at(-1);
     const secondItem = dropItem.at(-1);
-
     if (firstItem && secondItem){ 
       dispatch(changeOrderTodos({first: firstItem, second: secondItem}))
       dispatch(clearDragArray()), dispatch(clearDropArray());
     }
-  },[dragItem, dropItem])
+  },[dropItem])
 
   return (   
     <div className='task-container'>  
@@ -108,7 +105,7 @@ export const Task: React.FC<Todo> = ({ id, title, status, project, archive, dele
           id={id} 
           value={taskTitle} 
           onChange={(e)=>  onHandleChangeTitle(e)} 
-          // onBlur={onChangeProjectTitle} 
+
           cols ={30}
           rows ={3}>
             {title}

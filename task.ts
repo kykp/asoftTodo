@@ -35,14 +35,50 @@ const getTasks = async (req: Request, res: Response) => {
     }  
   };
 
+const changeTaskStatus = async (req: Request, res: Response) => {
+  const {id, status} = req.body; 
+  try {
+    await TaskSchema.findOneAndUpdate({id}, {$set: {status}});
+    res.json()
+  } catch (error) {
+    console.log(error);
+  }
+ }
 
-const deleteTask = () => {}  
-
-
-
+ const changeTaskProject = async (req: Request, res: Response) => {
+  const {id, project} = req.body; 
+  try { 
+      if(project === "archive") {
+        await TaskSchema.findOneAndUpdate({id}, {$set: {archive: true, deleted: false}});
+      }
+      if(project === "deleted") {
+        await TaskSchema.findOneAndUpdate({id}, {$set: {deleted: true, archive: false}});
+      }  
+     if (project !== "archive" && project !== "deleted") {
+      await TaskSchema.findOneAndUpdate({id}, {$set: {project, deleted: false, archive: false}});
+      } 
+    res.json()
+  } catch (error) {
+    console.log(error);
+  }
+ } 
+ 
+ const changeTaskTitle = async (req: Request, res: Response) => {
+  const {id, title} = req.body; 
+  try {
+    await TaskSchema.findOneAndUpdate({id}, {$set: {title}});
+    res.json()
+  } catch (error) {
+    console.log(error);
+  }
+ }
+  
+  
 taskRouter.post("/add", addTask)
-taskRouter.post("/change", changeTask)
-taskRouter.post("/delete", deleteTask)
+taskRouter.post("/changeTaskTitle", changeTaskTitle)
+taskRouter.post("/changeTaskStatus", changeTaskStatus)
+taskRouter.post("/changeTaskProject", changeTaskProject)
+taskRouter.post("/change", changeTask) 
 taskRouter.get("/get", getTasks)
 
 export {taskRouter}

@@ -1,6 +1,6 @@
-import React, {useState, useEffect, MouseEvent} from 'react' 
+import React, {useState, useEffect} from 'react' 
 import { useAppSelector, useAppDispatch } from '../../hook' 
-import { filterBy,changeTask, clearDragArray } from '../../feauters/todo/todoSlice'
+import { filterBy, changeTaskProject, clearDragArray } from '../../feauters/todo/todoSlice'
 import { Popup } from './Popup' 
 import { ProjecPopup } from './ProjecPopup'
 import PenImg from "../../assets/icons/hamburger.png"
@@ -48,14 +48,16 @@ export const LeftMenu = () => {
     e.preventDefault();  
   }
   const dropHandler = (e: any) => {
-    e.preventDefault();   
+    e.preventDefault();    
     setNewStatusForDragItem(e.currentTarget.id);   
   }
 
   const setNewStatusForDragItem = ( project: string) => {    
-    let item = drag.at(-1); 
-    item? dispatch(changeTask({...item, project})): null; 
-    dispatch(clearDragArray()); 
+    const item = drag.at(-1); 
+    if( item ){
+      dispatch(changeTaskProject({id: item?.id, project})) 
+      dispatch(clearDragArray()); 
+    }
   } 
   return ( 
         <div className='left-menu'>
