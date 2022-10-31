@@ -7,6 +7,7 @@ import { fetchTasks } from "./feauters/todo/asyncActions";
 import { fetchProjects } from "./feauters/project/asyncActions";
 import { useAppDispatch } from "./hook";
 import { isReachable } from "./ServerReachable";
+
 function App() {
   const dispatch = useAppDispatch();
   isReachable();

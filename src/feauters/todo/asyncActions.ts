@@ -6,13 +6,14 @@ import {
   changeTaskReducer,
   changeTodoTitle,
 } from "./todoSlice";
+import { serverRequestSender } from "../../helpers/serverRequestSender";
 
 export const fetchTasks = createAsyncThunk<
   Todo[],
   void,
   { rejectValue: string }
 >("todos/fetchTasks", async (_, { rejectWithValue }) => {
-  const response = await fetch(`http://localhost:5000/tasks/get`);
+  const response = await serverRequestSender(`http://localhost:5000/tasks/get`);
   if (!response.ok) {
     return rejectWithValue(`server error`);
   }
@@ -36,13 +37,12 @@ export const addTask = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
       deleted,
       order,
     };
-    const response = await fetch(`http://localhost:5000/tasks/add`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newTask),
-    });
+    const response = await serverRequestSender(
+      `http://localhost:5000/tasks/add`,
+      {
+        newTask,
+      }
+    );
 
     if (!response.ok) {
       return rejectWithValue("cant add new project. Server Error");
@@ -58,15 +58,9 @@ export const changeTaskStatus = createAsyncThunk<
 >(
   "todos/changeTaskStatus",
   async ({ id, status }, { rejectWithValue, dispatch }) => {
-    const response = await fetch(
+    const response = await serverRequestSender(
       `http://localhost:5000/tasks/changeTaskStatus`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id, status }),
-      }
+      { id, status }
     );
 
     if (!response.ok) {
@@ -85,15 +79,9 @@ export const changeTaskProject = createAsyncThunk<
 >(
   "todos/changeTaskStatus",
   async ({ id, project }, { rejectWithValue, dispatch }) => {
-    const response = await fetch(
+    const response = await serverRequestSender(
       `http://localhost:5000/tasks/changeTaskProject`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id, project }),
-      }
+      { id, project }
     );
 
     if (!response.ok) {
@@ -112,15 +100,9 @@ export const changeTaskTitle = createAsyncThunk<
 >(
   "todos/changeTaskStatus",
   async ({ id, title }, { rejectWithValue, dispatch }) => {
-    const response = await fetch(
+    const response = await serverRequestSender(
       `http://localhost:5000/tasks/changeTaskTitle`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ id, title }),
-      }
+      { id, title }
     );
 
     if (!response.ok) {
@@ -138,12 +120,9 @@ export const changeTask = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
     { id, title, status, project, archive, deleted, order },
     { rejectWithValue, dispatch }
   ) => {
-    const response = await fetch(`http://localhost:5000/tasks/change`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const response = await serverRequestSender(
+      `http://localhost:5000/tasks/change`,
+      {
         id,
         title,
         status,
@@ -151,8 +130,8 @@ export const changeTask = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
         archive,
         deleted,
         order,
-      }),
-    });
+      }
+    );
 
     if (!response.ok) {
       return rejectWithValue("cant add new project. Server Error");
