@@ -1,51 +1,64 @@
-import React, {useState}  from 'react' 
-import { useAppDispatch } from '../../hook' 
-import {addProject} from "../../feauters/todo/todoSlice"
+import React, { useState } from "react";
+import { useAppDispatch } from "../../hook";
+import { addProject } from "../../feauters/project/asyncActions";
 import { v4 } from "uuid";
-import "./leftMenu.scss"
+import "./leftMenu.scss";
 
-interface PopupProps {
-  trigger: boolean,  
+type PopupProps = {
+  trigger: boolean;
   anchorPoint: {
-    x:number,
-    y:number,
-  }, 
-  onHandlePopup: () => void
-}
+    x: number;
+    y: number;
+  };
+  onHandlePopup: () => void;
+};
 
-export const Popup: React.FC <PopupProps> = (props) => { 
-  const [newProjectName, setNewProjectName] = useState("")
-  const dispatch = useAppDispatch(); 
- 
-  const onHandleCreateNewProject = () => { 
-    const newProject = { id : v4(), project: newProjectName, archive: false, deleted: false , weight: 9  }  
+export const Popup = (props: PopupProps) => {
+  const { trigger, anchorPoint, onHandlePopup } = props;
+  const [newProjectName, setNewProjectName] = useState("");
+  const dispatch = useAppDispatch();
+
+  const onHandleCreateNewProject = () => {
+    const newProject = {
+      id: v4(),
+      project: newProjectName,
+      archive: false,
+      deleted: false,
+      weight: 9,
+    };
     dispatch(addProject(newProject));
-    props.onHandlePopup();
-    setNewProjectName("")
-  }
+    onHandlePopup();
+    setNewProjectName("");
+  };
 
-  return props.trigger ? (
+  return trigger ? (
     <div className="popup popup__left-menu">
-      <div className="popup-inner popup-inner_left-menu" style={{ top: props.anchorPoint.y -5, left: props.anchorPoint.x +20 }}> 
-      <p>Введите название нового проекта:</p>
-      <input 
-        type="text" 
-        placeholder='Ведите название проекта'
-        value={newProjectName}
-        onChange={(e)=> setNewProjectName(e.currentTarget.value)}
+      <div
+        className="popup-inner popup-inner_left-menu"
+        style={{ top: anchorPoint.y - 5, left: anchorPoint.x + 20 }}
+      >
+        <p>Введите название нового проекта:</p>
+        <input
+          type="text"
+          placeholder="Ведите название проекта"
+          value={newProjectName}
+          onChange={(e) => setNewProjectName(e.currentTarget.value)}
         />
-        <div className='left-menu__buttons'>
-        <button 
-            className='button left-menu__button' 
-            onClick={props.onHandlePopup} 
-            >Отмена</button>
-        <button 
-            className='button left-menu__button'
+        <div className="left-menu__buttons">
+          <button className="button left-menu__button" onClick={onHandlePopup}>
+            Отмена
+          </button>
+          <button
+            className="button left-menu__button"
             onClick={onHandleCreateNewProject}
-            >Ок</button>
+          >
+            Ок
+          </button>
         </div>
-       
-      <button className="close-btn" onClick={props.onHandlePopup}>x</button> 
+
+        <button className="close-btn" onClick={onHandlePopup}>
+          x
+        </button>
       </div>
     </div>
   ) : null;
