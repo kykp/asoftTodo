@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   Todo,
+  dragAndDrop,
   changeTodoProject,
   changeOrderTodos,
   changeTodoTitle,
@@ -152,28 +153,31 @@ export const changeTaskTitle = createAsyncThunk<
   }
 );
 
-// export const changeTaskOrder = createAsyncThunk<
-//   { id: string; order: number },
-//   { id: string; order: number },
-//   { rejectValue: string }
-// >(
-//   "todos/changeTaskStatus",
-//   async ({ id, order }, { rejectWithValue, dispatch }) => {
-//     const response = await serverRequestSender(
-//       `http://localhost:5000/tasks/changeTaskTitle`,
-//       { id, order }
-//     );
+export const changeTodoOrder = createAsyncThunk<
+  { dragItem: dragAndDrop; dropItem: dragAndDrop },
+  { dragItem: dragAndDrop; dropItem: dragAndDrop },
+  { rejectValue: string }
+>(
+  "todos/changeTodoOrder",
+  async ({ dragItem, dropItem }, { rejectWithValue, dispatch }) => {
+    const response = await serverRequestSender(
+      `http://localhost:5000/tasks/changeTaskOrder`,
+      { items: { dragItem, dropItem } }
+    );
 
-//     if (!response.ok) {
-//       return rejectWithValue("cant change task project. Server Error");
-//     }
+    if (!response.ok) {
+      return rejectWithValue("cant change todo order. Server Error");
+    }
 
-//     dispatch(
-//       changeOrderTodos({ dragItem: { id, order }, dropItem: { id, order } })
-//     );
-//     return (await response.json()) as Todo;
-//   }
-// );
+    dispatch(
+      changeOrderTodos({
+        dragItem: { id: dragItem.id, order: dragItem.order },
+        dropItem: { id: dropItem.id, order: dropItem.order },
+      })
+    );
+    return { dragItem, dropItem };
+  }
+);
 
 // export const changeTask = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
 //   "todos/changeTask",

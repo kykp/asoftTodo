@@ -10,6 +10,7 @@ import {
 import {
   changeTaskTitle,
   changeTaskComplited,
+  changeTodoOrder,
 } from "../../feauters/todo/asyncActions";
 import GambIcon from "../../assets/icons/hamburger.png";
 import { Popup } from "../Popup/Popup";
@@ -86,9 +87,9 @@ export const Task = ({ id, title, project, archive, deleted, order }: Todo) => {
     const secondItem = dropItem.at(-1);
     if (firstItem && secondItem) {
       dispatch(
-        changeOrderTodos({
-          dragItem: { id: firstItem.id, order: firstItem.order },
-          dropItem: { id: secondItem.id, order: secondItem.order },
+        changeTodoOrder({
+          dragItem: { id: firstItem.id, order: firstItem.order, title },
+          dropItem: { id: secondItem.id, order: secondItem.order, title },
         })
       );
       dispatch(clearDragArray()), dispatch(clearDropArray());

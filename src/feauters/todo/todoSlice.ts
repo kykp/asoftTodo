@@ -14,7 +14,7 @@ export type Todo = {
   order: number;
 };
 
-type dragAndDrop = {
+export type dragAndDrop = {
   id: string;
   order: number;
   title: string;

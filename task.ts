@@ -90,6 +90,24 @@ const changeTaskTitle = async (req: Request, res: Response) => {
   }
 };
 
+const changeTaskOrder = async (req: Request, res: Response) => {
+  const { items } = req.body;
+  try {
+    const { dragItem, dropItem } = items;
+    await TaskSchema.findOneAndUpdate(
+      { id: dragItem.id },
+      { $set: { order: dropItem.order } }
+    );
+    await TaskSchema.findOneAndUpdate(
+      { id: dropItem.id },
+      { $set: { order: dragItem.order } }
+    );
+    res.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const changeTaskDeleted = async (req: Request, res: Response) => {
   const { id, deleted } = req.body;
   try {
@@ -114,9 +132,10 @@ taskRouter.post("/add", addTask);
 taskRouter.post("/delete", deleteTask);
 taskRouter.post("/changeTaskTitle", changeTaskTitle);
 taskRouter.post("/changeTaskCompleted", changeTaskCompleted);
+taskRouter.post("/changeTaskOrder", changeTaskOrder);
 taskRouter.post("/changeTaskDeleted", changeTaskDeleted);
 taskRouter.post("/changeTaskProject", changeTaskProject);
-taskRouter.post("/change", changeTask);
+// taskRouter.post("/change", changeTask);
 taskRouter.get("/get", getTasks);
 
 export { taskRouter };
