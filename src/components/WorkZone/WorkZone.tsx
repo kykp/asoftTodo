@@ -6,9 +6,11 @@ import { v4 as uuidv4 } from "uuid";
 import { Task } from "../../components/Task/Task";
 import {
   selectFilters,
+  selectTodos,
   selectTodosByFilter,
 } from "../../feauters/todo/selectors";
 import { selectProjects } from "../../feauters/project/seclectors";
+
 type Todo = {
   id: string;
   title: string;
@@ -20,11 +22,13 @@ type Todo = {
 
 export const WorkZone = () => {
   const filter = useAppSelector(selectFilters);
+  const todosForOrder = useAppSelector(selectTodos);
   const todos = useAppSelector(selectTodosByFilter);
   const projects = useAppSelector(selectProjects);
   const [projectTitle, setProjectTitle] = useState("Входящие");
   const dispatch = useAppDispatch();
 
+  console.log(todosForOrder.length);
   useEffect(() => {
     const findTitleProject = projects.find((project) => project.id === filter);
     findTitleProject ? setProjectTitle(findTitleProject.project) : null;
@@ -37,7 +41,7 @@ export const WorkZone = () => {
       project: filter,
       archive: false,
       deleted: false,
-      order: todos.length + 1,
+      order: todosForOrder.length + 1,
     };
     dispatch(addTask(todo));
   };
