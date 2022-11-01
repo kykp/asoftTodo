@@ -10,7 +10,7 @@
     z-index:200;
 }
 
-.popup-inner {
+.popup_inner {
     position: absolute;
     top:150px;
     left: 0;
@@ -40,7 +40,7 @@
     }
 }
 
-.popup-inner .close-btn {
+.popup_inner .close_btn {
     position: absolute;
     top: 0px;
     right: 10px;
@@ -53,7 +53,7 @@
 }
 
 @media screen and (max-width: 1000px) {
-    .popup-inner { 
+    .popup_inner { 
         display: block;
         top: 150px!important;
         left: 150px!important;

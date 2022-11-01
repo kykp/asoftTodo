@@ -1,20 +1,19 @@
 import express from "express";
-import { projectRouter } from "./project.js"; 
-import { taskRouter } from "./task.js"; 
+import { projectRouter } from "./project.js";
+import { taskRouter } from "./task.js";
 import { startBaseMongo } from "./mongoconnect.js";
 import bodyParser from "body-parser";
-import  cors from "cors";
+import cors from "cors";
 
 let urlencodedParser = bodyParser.urlencoded({ extended: false });
-
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 app.use(cors());
 
-app.use(express.json());  
-app.use("/projects", urlencodedParser, projectRouter); 
-app.use("/tasks", urlencodedParser, taskRouter); 
+app.use(express.json());
+app.use("/projects", urlencodedParser, projectRouter);
+app.use("/tasks", urlencodedParser, taskRouter);
 
 app.listen(PORT, () => {
   startBaseMongo();

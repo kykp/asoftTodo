@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useAppDispatch } from "../../hook";
 import { addProject } from "../../feauters/project/asyncActions";
 import { v4 } from "uuid";
-import "./leftMenu.scss";
+import styles from "./leftMenu.module.scss";
 
 type PopupProps = {
   trigger: boolean;
@@ -32,9 +32,16 @@ export const Popup = (props: PopupProps) => {
   };
 
   return trigger ? (
-    <div className="popup popup__left-menu">
+    <div
+      className={`
+      ${styles.popup}
+      ${styles.popup__left_menu}
+      `}
+    >
       <div
-        className="popup-inner popup-inner_left-menu"
+        className={`
+        ${styles.popup_inner}
+        ${styles.popup_inner_left_menu}`}
         style={{ top: anchorPoint.y - 5, left: anchorPoint.x + 20 }}
       >
         <p>Введите название нового проекта:</p>
@@ -44,19 +51,34 @@ export const Popup = (props: PopupProps) => {
           value={newProjectName}
           onChange={(e) => setNewProjectName(e.currentTarget.value)}
         />
-        <div className="left-menu__buttons">
-          <button className="button left-menu__button" onClick={onHandlePopup}>
+        <div className={styles.left_menu__buttons}>
+          <button
+            className={`
+            ${styles.button}
+            ${styles.left_menu__button}
+            `}
+            onClick={onHandlePopup}
+          >
             Отмена
           </button>
           <button
-            className="button left-menu__button"
+            disabled={newProjectName.length < 1 ? true : false}
+            title={
+              newProjectName.length < 1
+                ? "Введите название проекта"
+                : "Подтвердить"
+            }
+            className={`
+            ${styles.button}
+            ${styles.left_menu__button}
+            `}
             onClick={onHandleCreateNewProject}
           >
             Ок
           </button>
         </div>
 
-        <button className="close-btn" onClick={onHandlePopup}>
+        <button className={styles.close_btn} onClick={onHandlePopup}>
           x
         </button>
       </div>

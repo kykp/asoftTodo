@@ -1,10 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   Todo,
-  changeTodosStatus,
   changeTodoProject,
-  changeTaskReducer,
+  changeOrderTodos,
   changeTodoTitle,
+  changeTodoComplited,
+  changeTodoDeleted,
 } from "./todoSlice";
 import { serverRequestSender } from "../../helpers/serverRequestSender";
 
@@ -25,13 +26,12 @@ export const fetchTasks = createAsyncThunk<
 export const addTask = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
   "todos/addTask",
   async (
-    { id, title, status, project, archive, deleted, order },
+    { id, title, project, archive, deleted, order },
     { rejectWithValue }
   ) => {
     const newTask = {
       id,
       title,
-      status,
       project,
       archive,
       deleted,
@@ -39,9 +39,7 @@ export const addTask = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
     };
     const response = await serverRequestSender(
       `http://localhost:5000/tasks/add`,
-      {
-        newTask,
-      }
+      newTask
     );
 
     if (!response.ok) {
@@ -51,23 +49,63 @@ export const addTask = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
     return (await response.json()) as Todo;
   }
 );
-export const changeTaskStatus = createAsyncThunk<
-  { id: string; status: string },
-  { id: string; status: string },
+
+export const deleteTask = createAsyncThunk<
+  { id: string },
+  { id: string },
+  { rejectValue: string }
+>("todos/changeTask", async ({ id }, { rejectWithValue, dispatch }) => {
+  const response = await serverRequestSender(
+    `http://localhost:5000/tasks/delete`,
+    { id }
+  );
+
+  if (!response.ok) {
+    return rejectWithValue("cant delete task. Server Error");
+  }
+
+  // dispatch(changeTodosStatus({ id }));
+  return (await response.json()) as Todo;
+});
+
+export const changeTaskComplited = createAsyncThunk<
+  { id: string; archive: boolean },
+  { id: string; archive: boolean },
   { rejectValue: string }
 >(
-  "todos/changeTaskStatus",
-  async ({ id, status }, { rejectWithValue, dispatch }) => {
+  "todos/changeTaskComplited",
+  async ({ id, archive }, { rejectWithValue, dispatch }) => {
     const response = await serverRequestSender(
-      `http://localhost:5000/tasks/changeTaskStatus`,
-      { id, status }
+      `http://localhost:5000/tasks/changeTaskCompleted`,
+      { id, archive }
     );
 
     if (!response.ok) {
-      return rejectWithValue("cant change task status. Server Error");
+      return rejectWithValue("cant change task completed. Server Error");
     }
 
-    dispatch(changeTodosStatus({ id, status }));
+    dispatch(changeTodoComplited({ id, archive }));
+    return (await response.json()) as Todo;
+  }
+);
+
+export const changeTaskDeleted = createAsyncThunk<
+  { id: string; deleted: boolean },
+  { id: string; deleted: boolean },
+  { rejectValue: string }
+>(
+  "todos/changeTaskComplited",
+  async ({ id, deleted }, { rejectWithValue, dispatch }) => {
+    const response = await serverRequestSender(
+      `http://localhost:5000/tasks/changeTaskDeleted`,
+      { id, deleted }
+    );
+
+    if (!response.ok) {
+      return rejectWithValue("cant change task deleted. Server Error");
+    }
+
+    dispatch(changeTodoDeleted({ id, deleted }));
     return (await response.json()) as Todo;
   }
 );
@@ -114,32 +152,61 @@ export const changeTaskTitle = createAsyncThunk<
   }
 );
 
-export const changeTask = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
-  "todos/changeTask",
-  async (
-    { id, title, status, project, archive, deleted, order },
-    { rejectWithValue, dispatch }
-  ) => {
-    const response = await serverRequestSender(
-      `http://localhost:5000/tasks/change`,
-      {
-        id,
-        title,
-        status,
-        project,
-        archive,
-        deleted,
-        order,
-      }
-    );
+// export const changeTaskOrder = createAsyncThunk<
+//   { id: string; order: number },
+//   { id: string; order: number },
+//   { rejectValue: string }
+// >(
+//   "todos/changeTaskStatus",
+//   async ({ id, order }, { rejectWithValue, dispatch }) => {
+//     const response = await serverRequestSender(
+//       `http://localhost:5000/tasks/changeTaskTitle`,
+//       { id, order }
+//     );
 
-    if (!response.ok) {
-      return rejectWithValue("cant add new project. Server Error");
-    }
+//     if (!response.ok) {
+//       return rejectWithValue("cant change task project. Server Error");
+//     }
 
-    dispatch(
-      changeTaskReducer({ id, title, status, project, archive, deleted, order })
-    );
-    return (await response.json()) as Todo;
-  }
-);
+//     dispatch(
+//       changeOrderTodos({ dragItem: { id, order }, dropItem: { id, order } })
+//     );
+//     return (await response.json()) as Todo;
+//   }
+// );
+
+// export const changeTask = createAsyncThunk<Todo, Todo, { rejectValue: string }>(
+//   "todos/changeTask",
+//   async (
+//     { id, title, project, archive, deleted, order },
+//     { rejectWithValue, dispatch }
+//   ) => {
+//     const response = await serverRequestSender(
+//       `http://localhost:5000/tasks/change`,
+//       {
+//         id,
+//         title,
+//         project,
+//         archive,
+//         deleted,
+//         order,
+//       }
+//     );
+
+//     if (!response.ok) {
+//       return rejectWithValue("cant add new project. Server Error");
+//     }
+
+//     dispatch(
+//       changeTaskReducer({
+//         id,
+//         title,
+//         project,
+//         archive,
+//         deleted,
+//         order,
+//       })
+//     );
+//     return (await response.json()) as Todo;
+//   }
+// );

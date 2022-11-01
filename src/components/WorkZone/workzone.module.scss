@@ -1,13 +1,9 @@
-@import "../../index.scss";
-
 .workzone {
     width: 100%;
     min-height: 95vh;  
     overflow-y: hidden; 
-    overflow-x: auto;
-    background-color: rgba(0,0,0,0.09);
-  
-
+    overflow-x: auto; 
+    background-color: #1f1f1f11;;
 }
 .tasks {
     display: flex;
@@ -18,13 +14,12 @@
     width: 100%;
     max-height: 90vh;
     height: 100%; 
-    overflow-y: auto;
-
+    overflow-y: auto; 
     &__item {
         display: flex;
-        max-width: 300px;
+        max-width: 500px;
         flex-direction: column; 
-        border-radius: 7px;
+        border-radius: 5px;
         box-shadow: 1px 1px 1px 1px rgba(0, 0, 0, 0.42);
         align-items: center;
         background: rgb(134, 179, 245);
@@ -55,14 +50,13 @@
     align-items: center;
     justify-content: space-between;
     text-align: center;
-    width: 300px; 
-    min-height: 120px;   
-    border-radius: 15px;
+    width: 500px; 
+    min-height: 120px;    
     height: fit-content;
     max-height: 100%;
     padding: 20px 20px;
-    overflow-y: auto;  
-    
+    overflow-y: auto;   
+    overflow: hidden;
     &__title {
         text-align: center; 
     } 

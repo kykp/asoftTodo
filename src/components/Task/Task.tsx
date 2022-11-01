@@ -7,38 +7,32 @@ import {
   clearDragArray,
   clearDropArray,
 } from "../../feauters/todo/todoSlice";
-import { changeTaskTitle } from "../../feauters/todo/asyncActions";
+import {
+  changeTaskTitle,
+  changeTaskComplited,
+} from "../../feauters/todo/asyncActions";
 import GambIcon from "../../assets/icons/hamburger.png";
 import { Popup } from "../Popup/Popup";
 import { selectDragItem, selectDropItem } from "../../feauters/todo/selectors";
-import "./task.scss";
+import styles from "./task.module.scss";
 
 type Todo = {
   id: string;
   title: string;
-  status: string;
   project: string;
   archive: boolean;
   deleted: boolean;
   order: number;
-  setNewStatusForDragItem: (status: string) => void;
 };
 
-export const Task = ({
-  id,
-  title,
-  status,
-  project,
-  archive,
-  deleted,
-  order,
-  setNewStatusForDragItem,
-}: Todo) => {
+export const Task = ({ id, title, project, archive, deleted, order }: Todo) => {
   const [taskTitle, setTaskTitle] = useState(title);
   const [showPopup, setShowPopup] = useState(false);
+  // const [showHamburger, setShowHamburger] = useState(false);
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const dragItem = useAppSelector(selectDragItem);
   const dropItem = useAppSelector(selectDropItem);
+
   const dispatch = useAppDispatch();
 
   const onHandlePopup = () => {
@@ -85,7 +79,6 @@ export const Task = ({
     e.preventDefault();
     target.style.boxShadow = "1px 1px 0px 1px rgb(0 0 0 / 51%)";
     dispatch(addDropObject({ id }));
-    setNewStatusForDragItem(status);
   };
 
   useEffect(() => {
@@ -103,8 +96,16 @@ export const Task = ({
   }, [dropItem]);
 
   return (
-    <div className="task-container">
-      <div className="task-container__header">
+    <div className={styles.task_container}>
+      <input
+        style={deleted ? { display: "none" } : { display: "flex" }}
+        checked={archive ? true : false}
+        type="checkbox"
+        readOnly={true}
+        className={styles.input}
+        onClick={() => dispatch(changeTaskComplited({ id, archive: !archive }))}
+      />
+      <div className={styles.task_container__header}>
         <img
           id={id}
           src={GambIcon}
@@ -114,7 +115,6 @@ export const Task = ({
         <Popup
           id={id}
           title={title}
-          status={status}
           project={project}
           archive={archive}
           deleted={deleted}
@@ -124,6 +124,7 @@ export const Task = ({
           order={order}
         />
       </div>
+
       <textarea
         onDragStart={dragStartHandler}
         onDragLeave={(e) => dragLeaveHandler(e)}
@@ -131,17 +132,19 @@ export const Task = ({
         onDragOver={(e) => dragOverHandler(e)}
         onDrop={(e) => dropHandler(e)}
         draggable={true}
-        className="task-container__text"
+        className={styles.task_container__text}
         placeholder="Ввести заголовок для этой карточки"
         name={taskTitle}
         id={id}
         value={taskTitle}
         onChange={(e) => onHandleChangeTitle(e)}
-        cols={30}
-        rows={3}
       >
         {title}
       </textarea>
+      <div
+        style={!archive ? { display: "none" } : { display: "block" }}
+        className={styles.cross_div}
+      ></div>
     </div>
   );
 };

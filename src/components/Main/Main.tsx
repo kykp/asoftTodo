@@ -1,12 +1,12 @@
-import React from 'react'
+import React from "react";
 import { LeftMenu } from "../../components/LeftMenu/LeftMenu";
-import { WorkZone } from "../../components/WorkZone/WorkZone";  
+import { WorkZone } from "../../components/WorkZone/WorkZone";
 
 export const Main = () => {
-  return ( 
+  return (
     <main>
-    <LeftMenu/>
-    <WorkZone/>
-     </main>  
-  )
-}
+      <LeftMenu />
+      <WorkZone />
+    </main>
+  );
+};

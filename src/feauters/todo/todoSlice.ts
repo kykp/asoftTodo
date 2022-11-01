@@ -8,7 +8,6 @@ export const filters = {
 export type Todo = {
   id: string;
   title: string;
-  status: string;
   project: string;
   archive: boolean;
   deleted: boolean;
@@ -18,7 +17,6 @@ export type Todo = {
 type dragAndDrop = {
   id: string;
   order: number;
-  status: string;
   title: string;
 };
 
@@ -72,16 +70,23 @@ export const todoSlice = createSlice({
         }
       }
     },
-    changeTodosStatus: (
+    changeTodoDeleted: (
       state,
-      action: PayloadAction<{ id: string; status: string }>
+      action: PayloadAction<{ id: string; deleted: boolean }>
     ) => {
-      const currentTask = state.list.find(
+      const currentTodo = state.list.find(
         (todo) => todo.id === action.payload.id
       );
-      if (currentTask) {
-        currentTask.status = action.payload.status;
-      }
+      currentTodo ? (currentTodo.deleted = action.payload.deleted) : null;
+    },
+    changeTodoComplited: (
+      state,
+      action: PayloadAction<{ id: string; archive: boolean }>
+    ) => {
+      const currentTodo = state.list.find(
+        (todo) => todo.id === action.payload.id
+      );
+      currentTodo ? (currentTodo.archive = action.payload.archive) : null;
     },
     changeOrderTodos: (
       state,
@@ -172,8 +177,9 @@ export const {
   clearDropArray,
   clearProject,
   changeOrderTodos,
-  changeTodosStatus,
   changeTodoProject,
+  changeTodoComplited,
+  changeTodoDeleted,
 } = todoSlice.actions;
 
 export default todoSlice.reducer;

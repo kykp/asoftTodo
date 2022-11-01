@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "../../hook";
 import {
   delProject,
   changeProjectTitle,
 } from "../../feauters/project/asyncActions";
-import "./leftMenu.scss";
+import styles from "./leftMenu.module.scss";
 
 type PopupProps = {
   trigger: boolean;
@@ -40,23 +40,40 @@ export const ProjecPopup = (props: PopupProps) => {
     setNeedToChangeProjectName(true);
   };
 
+  useEffect(() => {
+    !trigger ? setNeedToChangeProjectName(false) : null;
+  }, [trigger]);
   return trigger ? (
-    <div className="popup popup__left-menu">
+    <div
+      className={`
+    ${styles.popup}
+    ${styles.popup__left_menu}
+    `}
+    >
       <div
-        className="popup-inner"
+        className={styles.popup_inner}
         style={{ top: anchorPoint.y, left: anchorPoint.x }}
       >
         {!needToChangeProjectName ? (
           <>
             <p>Выберите действие :</p>
+
             <button
-              className="button left-menu__button popup-inner__menu"
+              className={`
+              ${styles.button_project}
+              ${styles.left_menu__button}
+              ${styles.poppup_inner__menu}
+              `}
               onClick={letsChangeNameProject}
             >
               Изменить
             </button>
             <button
-              className="button left-menu__button popup-inner__menu"
+              className={`
+              ${styles.button_project}
+              ${styles.left_menu__button}
+              ${styles.poppup_inner__menu}
+              `}
               onClick={onHandleDeleteProject}
             >
               Удалить
@@ -66,21 +83,26 @@ export const ProjecPopup = (props: PopupProps) => {
           <>
             <p>Введите новое имя проекта</p>
             <input
-              className="projecPopup__input"
+              className={styles.projec_popup__input}
               type="text"
               placeholder="Ведите название проекта"
               value={newProjectName}
               onChange={(e) => setNewProjectName(e.currentTarget.value)}
             />
-            <div className="left-menu__buttons">
+            <div className={styles.left_menu__buttons}>
               <button
-                className="button left-menu__button"
+                className={`
+                ${styles.button_project}
+                ${styles.left_menu__button}
+                `}
                 onClick={onHandlePopupProject}
               >
                 Отмена
               </button>
               <button
-                className="button left-menu__button"
+                className={`
+                ${styles.button_project}
+                ${styles.left_menu__button}`}
                 onClick={onHandleChangeNameProject}
               >
                 Ок
@@ -88,7 +110,7 @@ export const ProjecPopup = (props: PopupProps) => {
             </div>
           </>
         )}
-        <button className="close-btn" onClick={onHandlePopupProject}>
+        <button className={styles.close_btn} onClick={onHandlePopupProject}>
           x
         </button>
       </div>

@@ -5,9 +5,10 @@ import { changeTaskProject } from "../../feauters/todo/asyncActions";
 import { Popup } from "./Popup";
 import { ProjecPopup } from "./ProjecPopup";
 import PenImg from "../../assets/icons/hamburger.png";
-import "./leftMenu.scss";
 import { selectFilters, selectDragItem } from "../../feauters/todo/selectors";
 import { selectProjects } from "../../feauters/project/seclectors";
+import styles from "./leftMenu.module.scss";
+
 export const LeftMenu = () => {
   const [currentProjectId, setCurrentProjectId] = useState("");
   const [activeButton, setActiveButton] = useState("incomming");
@@ -16,7 +17,7 @@ export const LeftMenu = () => {
   const [anchorPoint, setAnchorPoint] = useState({ x: 0, y: 0 });
   const projects = useAppSelector(selectProjects);
   const filter = useAppSelector(selectFilters);
-  const drag = useAppSelector(selectDragItem);
+  const dragItem = useAppSelector(selectDragItem);
 
   const dispatch = useAppDispatch();
 
@@ -61,31 +62,33 @@ export const LeftMenu = () => {
   };
 
   const setNewStatusForDragItem = (project: string) => {
-    const item = drag.at(-1);
+    const item = dragItem.at(-1);
     if (item) {
       dispatch(changeTaskProject({ id: item.id, project }));
       dispatch(clearDragArray());
     }
   };
+
   return (
-    <div className="left-menu">
+    <div className={styles.left_menu}>
       <h2>Проекты</h2>
-      <ul className="projects-list">
+      <ul className={styles.projects_list}>
         {newProjects.map((el) => (
           <div
             id={el.id}
             onDragOver={(e) => dragOverHandler(e)}
             onDrop={(e) => dropHandler(e)}
             key={el.project}
-            className="projects-list__cover"
+            className={styles.projects_list__cover}
           >
             <li
               title={el.project}
-              className={
-                activeButton === el.id
-                  ? "left-menu__button left-menu__button_active"
-                  : "left-menu__button"
-              }
+              className={`
+              ${styles.left_menu__button}
+              ${
+                activeButton === el.id ? styles.left_menu__button_active : null
+              } 
+              `}
               id={el.id}
               onClick={(e) => onHandleCurrentProject(e)}
             >
@@ -98,7 +101,7 @@ export const LeftMenu = () => {
               <img
                 id={el.id}
                 style={{ visibility: "visible" }}
-                className="projects-list__pencil-img"
+                className={styles.projects_list__pencil_img}
                 src={PenImg}
                 onClick={(e) => {
                   onHandlePopupProject();
@@ -109,7 +112,7 @@ export const LeftMenu = () => {
             ) : (
               <img
                 style={{ visibility: "hidden" }}
-                className="projects-list__pencil-img"
+                className={styles.projects_list__pencil_img}
                 src={PenImg}
                 alt="burger-menu"
               />
@@ -119,7 +122,10 @@ export const LeftMenu = () => {
       </ul>
 
       <button
-        className="button left-menu__button"
+        className={`
+        ${styles.button}
+        ${styles.left_menu__button}
+        `}
         onClick={(e) => onHandleAddNewProject(e)}
       >
         Добавить проект
