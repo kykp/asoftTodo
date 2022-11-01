@@ -28,7 +28,7 @@
     "tsc": "tsc",
     "build": "react-scripts build",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
-    "dev": "concurrently \"tsc\" \"npm run server\" \"npm run start\""
+    "dev": "concurrently \"npm run tsc\" \"npm run server\" \"npm run start\""
   },
   "browserslist": {
     "production": [
